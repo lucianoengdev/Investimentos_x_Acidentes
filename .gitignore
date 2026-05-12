@@ -1,0 +1,27 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Data outputs
+data/processed/*.csv
+data/processed/*.parquet
+
+# Local/private files
+.env
+.DS_Store
+Thumbs.db
+
+# Reports generated during analysis
+reports/figures/**/*.png
+reports/figures/**/*.jpg
+reports/figures/**/*.svg
+reports/figures/**/*.pdf
