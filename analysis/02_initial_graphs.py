@@ -49,7 +49,7 @@ plt.tight_layout()
 plt.savefig('../reports/figures/01_initial_analysis/tipo_de_acidentes_por_ano.png')
 
 plt.figure(figsize=(12,6))
-plt.hist(df['km'].dropna(), bins=20)
+plt.hist(df['km_ajustado'].dropna(), bins=20)
 plt.title('Histograma de acidentes por KM')
 plt.xlabel('KM')
 plt.ylabel('Frequência')
