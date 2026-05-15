@@ -7,22 +7,33 @@ df_raw_i = pd.read_csv('../data/raw/investimentos.csv', sep=';')
 df_processed_a = df_raw_a.copy()
 df_processed_i = df_raw_i.copy()
 
+df_less = df_processed_a[df_processed_a['km'] < 200].copy()
+df_more = df_processed_a[df_processed_a['km'] > 200].copy()
+
+df_more_min = df_more['km'].min()
+df_more['km_ajustado'] = df_more['km'] - df_more_min
+df_more_max = df_more['km_ajustado'].max() + 0.1
+df_less['km_ajustado'] = df_less['km'] + df_more_max
+
+frames = [df_more, df_less]
+
+df_processed_a = pd.concat(frames)
+
 df_processed_a['data'] = pd.to_datetime(df_processed_a['data'], dayfirst=True)
-df_processed_a['km'] = pd.to_numeric(df_processed_a['km'])
+df_processed_a['km_ajustado'] = pd.to_numeric(df_processed_a['km_ajustado'])
 cols_to_int = ['automovel', 'bicicleta', 'caminhao', 'moto', 'onibus', 'outros', 'tracao_animal', 'transporte_de_cargas_especiais', 'trator_maquinas', 'utilitarios', 'ilesos', 'levemente_feridos', 'moderadamente_feridos', 'gravemente_feridos', 'mortos']
-df_processed_a[cols_to_int] =df_processed_a[cols_to_int].apply(pd.to_numeric)
+df_processed_a[cols_to_int] = df_processed_a[cols_to_int].apply(pd.to_numeric)
 
 df_processed_a['ano'] = pd.to_datetime(df_processed_a['data'], dayfirst=True).dt.year
 df_processed_a['mes'] = pd.to_datetime(df_processed_a['data'], dayfirst=True).dt.month
 df_processed_a['acidente_fatal'] = np.where(df_processed_a['mortos'] > 0, 1, 0)
 
-bins_a = range(0, int(df_processed_a['km'].max()) + 5, 5)
-df_processed_a['km_bin'] = pd.cut(df_processed_a['km'], bins=bins_a)
+bins_a = range(0, int(df_processed_a['km_ajustado'].max()) + 5, 5)
+df_processed_a['km_bin'] = pd.cut(df_processed_a['km_ajustado'], bins=bins_a, include_lowest=True)
 
 """
 print("Number of NaN: ", df_processed_a.isna().sum())
-Number of NaN:  
-data                                0
+Number of NaN:  data                                0
 horario                             0
 n_da_ocorrencia                     0
 tipo_de_ocorrencia                  0
@@ -45,15 +56,15 @@ levemente_feridos                   0
 moderadamente_feridos               0
 gravemente_feridos                  0
 mortos                              0
+km_ajustado                         0
 ano                                 0
 mes                                 0
 acidente_fatal                      0
-km_bin                             64
+km_bin                              0
 dtype: int64
 
 print("Number of NaN: ", df_processed_i.isna().sum())
-Number of NaN:  
-concessionaria     0
+Number of NaN:  concessionaria     0
 ano                0
 Valor             58
 dtype: int64
@@ -64,44 +75,20 @@ print(df_processed_a['ano'].min(), df_processed_a['ano'].max())
 print(sorted(df_processed_a['ano'].unique()))
 [np.int32(2010), np.int32(2011), np.int32(2012), np.int32(2013), np.int32(2014), np.int32(2015), np.int32(2016), np.int32(2017), np.int32(2018), np.int32(2019), np.int32(2020), np.int32(2021), np.int32(2022), np.int32(2023), np.int32(2024), np.int32(2025), np.int32(2026)]
 
-print("duplicates: ", df_processed_a.duplicated().sum)
-duplicates:  <bound method Series.sum of 
-0         False
-1         False
-2         False
-3         False
-4         False
-          ...  
-137571    False
-137572    False
-137573    False
-137574    False
-137575    False
-Length: 137576, dtype: bool>
+print("duplicates: ", df_processed_a.duplicated().sum())
+duplicates:  0
 
-print("duplicates: ", df_processed_i.duplicated().sum)
-duplicates:  <bound method Series.sum of 
-0      False
-1      False
-2      False
-3      False
-4      False
-       ...  
-355    False
-356    False
-357    False
-358    False
-359    False
-Length: 360, dtype: bool>
+print("duplicates: ", df_processed_i.duplicated().sum())
+duplicates:  0
 
 print("acidents with death: ", df_processed_a['acidente_fatal'].value_counts())
 acidents with death:  acidente_fatal
-0    135415 -> No Deaths
-1      2161 -> Deaths
+0    135415
+1      2161
+Name: count, dtype: int64
 
 print(df_raw_a.describe())
-Name: count, dtype: int64
-        n_da_ocorrencia             km      automovel      bicicleta       caminhao  ...         ilesos  levemente_feridos  moderadamente_feridos  gravemente_feridos         mortos
+       n_da_ocorrencia             km      automovel      bicicleta       caminhao  ...         ilesos  levemente_feridos  moderadamente_feridos  gravemente_feridos         mortos
 count    137576.000000  137576.000000  137576.000000  137576.000000  137576.000000  ...  137576.000000      137576.000000          137576.000000       137576.000000  137576.000000
 mean        240.229975     522.619949       0.872550       0.003693       0.309669  ...       1.572200           0.348709               0.058818            0.017816       0.017816
 std         147.639026     300.757640       0.816695       0.063350       0.580012  ...       2.042658           0.800486               0.301044            0.147653       0.154486
@@ -141,7 +128,7 @@ print(df_raw_i.head())
 4         ECOSUL  2010   19100000.0
 
 print(df_processed_a.shape, df_processed_i.shape)
-(137576, 27) (360, 3)
+(137576, 28) (360, 3)
 """
 
 df_processed_a.to_csv('../data/processed/acidentes_tratados.csv', index=False)
