@@ -1,9 +1,10 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 df = pd.read_csv('../data/processed/acidentes_tratados.csv')
-
+"""
 cols_ano = ['acidente_fatal', 'mortos']
 df_fatal = df.groupby('ano')[cols_ano].sum().reset_index()
 df_fatal['acidentes'] = df.groupby('ano').size().values
@@ -56,3 +57,28 @@ plt.ylabel('Frequência')
 plt.grid(True, alpha=0.2)
 plt.tight_layout()
 plt.savefig('../reports/figures/01_initial_analysis/histograma_acidentes_km.png')
+"""
+
+bins_a = range(0, int(df['km_ajustado'].max()) + 5, 5)
+df['km_bin'] = pd.cut(df['km_ajustado'], bins=bins_a, include_lowest=True)
+df_heat = pd.crosstab(df['km_bin'], df['tipo_de_acidente']).sort_index()
+plt.figure(figsize=(16,12))
+sns.heatmap(df_heat, cmap='Reds', linewidths= 0.5, annot=False)
+plt.title('Heatmap Tipo de acidente')
+plt.xlabel('Tipo de Acidente')
+plt.ylabel('km')
+plt.xticks(rotation=90)
+plt.tight_layout()
+plt.savefig('../reports/figures/02_hotspots/heatmap_tipo_de_acidente.png')
+
+df_fatal = df[df['acidente_fatal'] == 1]
+df_heat_fatal = pd.crosstab(df_fatal['km_bin'], df_fatal['tipo_de_acidente']).sort_index()
+plt.figure(figsize=(16,12))
+sns.heatmap(df_heat_fatal, cmap='Reds', linewidths= 0.5, annot=False)
+plt.title('Heatmap Acidentes Fatais')
+plt.xlabel('Tipo de Acidente Fatal')
+plt.ylabel('km')
+plt.xticks(rotation=90)
+plt.tight_layout()
+plt.savefig('../reports/figures/02_hotspots/heatmap_tipo_de_acidente_fatais.png')
+
