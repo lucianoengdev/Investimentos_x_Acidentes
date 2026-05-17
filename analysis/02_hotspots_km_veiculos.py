@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import textwrap
 
 df = pd.read_csv('../data/processed/acidentes_tratados.csv')
 """
@@ -81,4 +82,31 @@ plt.ylabel('km')
 plt.xticks(rotation=90)
 plt.tight_layout()
 plt.savefig('../reports/figures/02_hotspots/heatmap_tipo_de_acidente_fatais.png')
+
+bins_20 = range(0, int(df['km_ajustado'].max()) + 20, 20)
+df['km_bin20'] = pd.cut(df['km_ajustado'], bins=bins_20, include_lowest=True)
+plt.figure(figsize=(12, 8))
+lista_de_tipos = df.groupby('tipo_de_acidente')['mortos'].sum().sort_values(ascending=False).head(10).index.tolist()
+df_filtrado = df[df['tipo_de_acidente'].isin(lista_de_tipos)]
+heatmap_df = (df_filtrado
+    .pivot_table(
+        index='km_bin20',               
+        columns='tipo_de_acidente',    
+        values='mortos',               
+        aggfunc='sum',                
+        fill_value=0                  
+    )
+)
+sns.heatmap(heatmap_df, cmap='Reds', linewidths= 0.5, annot=True)
+labels_quebrados = [
+    '\n'.join(textwrap.wrap(label, width=18))
+    for label in heatmap_df.columns
+]
+plt.xticks(ticks=range(len(labels_quebrados)), labels=labels_quebrados, rotation=90)
+plt.xlabel('Tipo de acidente')
+plt.ylabel('KM')
+plt.title('Mortos por tipo de acidente e KM')
+plt.tight_layout()
+plt.savefig('../reports/figures/02_hotspots/mais_mortes_tipo_de_acidente.png')
+
 
