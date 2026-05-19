@@ -111,7 +111,8 @@ plt.savefig('../reports/figures/02_hotspots/mais_mortes_tipo_de_acidente.png')
 
 df['sentido_ajustado'] = df['sentido'].replace({'Sul': 'Crescente', 'Norte': 'Decrescente'})
 df_sentido = (df.pivot_table(index= 'km_bin20', columns= 'sentido_ajustado', values= 'mortos', aggfunc='sum', fill_value=0))
-df_sentido.plot(kind='bar', figsize=(12,6))
+plt.figure(figsize=(12,6))
+df_sentido.plot(kind='bar')
 plt.xlabel('Faixa de KM')
 plt.ylabel('Total de mortos')
 plt.title('Mortos por faixa de KM e sentido')
@@ -122,3 +123,17 @@ plt.savefig('../reports/figures/02_hotspots/mortes_por_sentido.png')
 
 # cresc = df.loc[df['sentido_ajustado'] == 'Crescente', 'mortos'].sum() -> 1306
 # decresc = df.loc[df['sentido_ajustado'] == 'Decrescente', 'mortos'].sum() -> 1145
+
+col_veiculos = ['automovel', 'bicicleta', 'caminhao', 'moto', 'onibus', 'outros', 'tracao_animal', 'transporte_de_cargas_especiais', 'trator_maquinas', 'utilitarios']
+df_fata = df[df['acidente_fatal'] == 1]
+mortes_veiculos = df_fata[col_veiculos].sum().sort_values(ascending= False)
+plt.figure(figsize=(12,6))
+mortes_veiculos.plot(kind= 'bar')
+labels_queb = ['\n'.join(textwrap.wrap(label, width=18))
+               for label in mortes_veiculos.index]
+plt.xticks(ticks=range(len(labels_queb)), labels=labels_queb, rotation= 45)
+plt.xlabel('Veículos')
+plt.ylabel('Quantidade envolvida em acidentes fatais')
+plt.title('Veículos envolvidos em acidentes fatais')
+plt.tight_layout()
+plt.savefig('../reports/figures/02_hotspots/mortes_por_tipo_de_veiculos.png')
