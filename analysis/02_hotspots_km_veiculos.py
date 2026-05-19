@@ -109,4 +109,16 @@ plt.title('Mortos por tipo de acidente e KM')
 plt.tight_layout()
 plt.savefig('../reports/figures/02_hotspots/mais_mortes_tipo_de_acidente.png')
 
+df['sentido_ajustado'] = df['sentido'].replace({'Sul': 'Crescente', 'Norte': 'Decrescente'})
+df_sentido = (df.pivot_table(index= 'km_bin20', columns= 'sentido_ajustado', values= 'mortos', aggfunc='sum', fill_value=0))
+df_sentido.plot(kind='bar', figsize=(12,6))
+plt.xlabel('Faixa de KM')
+plt.ylabel('Total de mortos')
+plt.title('Mortos por faixa de KM e sentido')
+plt.xticks(rotation= 45)
+plt.legend(title='Sentido')
+plt.tight_layout()
+plt.savefig('../reports/figures/02_hotspots/mortes_por_sentido.png')
 
+# cresc = df.loc[df['sentido_ajustado'] == 'Crescente', 'mortos'].sum() -> 1306
+# decresc = df.loc[df['sentido_ajustado'] == 'Decrescente', 'mortos'].sum() -> 1145
