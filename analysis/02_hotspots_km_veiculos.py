@@ -137,3 +137,41 @@ plt.ylabel('Quantidade envolvida em acidentes fatais')
 plt.title('Veículos envolvidos em acidentes fatais')
 plt.tight_layout()
 plt.savefig('../reports/figures/02_hotspots/mortes_por_tipo_de_veiculos.png')
+plt.close()
+
+top_veiculos = mortes_veiculos.head(4).index.tolist()
+df_fata_veiculos = df_fata[['ano', 'km_bin20', 'mortos'] + top_veiculos].copy()
+df_veiculos_long = df_fata_veiculos.melt(
+    id_vars=['ano', 'km_bin20', 'mortos'],
+    value_vars=top_veiculos,
+    var_name='veiculo',
+    value_name='quantidade_veiculo'
+)
+df_veiculos_long = df_veiculos_long[df_veiculos_long['quantidade_veiculo'] > 0]
+fig, axes = plt.subplots(2, 2, figsize=(18, 14), sharex=True, sharey=True)
+for veiculo, ax in zip(top_veiculos, axes.flatten()):
+    df_veiculo = df_veiculos_long[df_veiculos_long['veiculo'] == veiculo]
+    matriz_veiculo = (
+        df_veiculo
+        .pivot_table(
+            index='km_bin20',
+            columns='ano',
+            values='mortos',
+            aggfunc='sum',
+            fill_value=0
+        )
+        .sort_index()
+    )
+    sns.heatmap(
+        matriz_veiculo,
+        cmap='Reds',
+        linewidths=0.3,
+        annot=False,
+        ax=ax,
+        cbar=True
+    )
+    ax.set_title(f'Mortes envolvendo {veiculo}')
+    ax.set_xlabel('Ano')
+    ax.set_ylabel('Faixa de KM')
+plt.tight_layout()
+plt.savefig('../reports/figures/02_hotspots/mortes_por_km_ano_e_veiculo.png')
