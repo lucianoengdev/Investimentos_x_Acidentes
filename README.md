@@ -138,6 +138,7 @@ This matters because hotspot analysis can be misleading if the road sequence is 
 |   |   |-- 02_hotspots/
 |   |   |-- 03_investimentos/
 |   |   `-- 04_modelos/
+|   |--01_initial_report.md/
 |   `-- artigo/
 |-- src/
 |   |-- data_processing.py
