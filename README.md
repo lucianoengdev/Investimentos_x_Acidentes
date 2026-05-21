@@ -7,7 +7,7 @@
 ![Seaborn](https://img.shields.io/badge/Seaborn-4C72B0?style=for-the-badge)
 ![scikit--learn](https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white)
 
-**Current version:** `v0.2.0-alpha`
+**Current version:** `v0.3.0-alpha`
 
 ## What This Does
 
@@ -58,9 +58,7 @@ acidente_fatal = mortos > 0
 
 ## Project Ambition
 
-The goal is to build a complete transportation data project while learning how to think like a data analyst, data scientist and data engineer.
-
-The project is not intended to simply produce charts. It is intended to document a full reasoning process:
+The goal is to build a complete transportation data project. The project is not intended to simply produce charts. It is intended to document a full reasoning process:
 
 1. understand the raw data;
 2. clean and validate the data;
@@ -74,7 +72,7 @@ The long-term ambition is to estimate whether investment levels appear related t
 
 ## Project Stage
 
-As of May 15, 2026, this project is a **work in progress**.
+As of May 21, 2026, this project is a **work in progress**.
 
 ### Done
 
@@ -86,14 +84,14 @@ As of May 15, 2026, this project is a **work in progress**.
 - [x] Initial charts reviewed and used to detect a kilometer discontinuity.
 - [x] Re-run Step 2 charts using the corrected kilometer reference.
 - [x] Compare original kilometer distribution vs corrected kilometer distribution.
+- [x] Step 3: Analyze hotspots by corrected kilometer, road direction and vehicle type.
 
 ### In Progress
 
-- [ ] Step 3: Analyze hotspots by corrected kilometer, road direction and vehicle type.
+- [ ] Step 4: Add investment data from `investimentos.csv`.
 
 ### Pending
 
-- [ ] Step 4: Add investment data from `investimentos.csv`.
 - [ ] Compare investment with fatal crashes using time lag.
 - [ ] Discuss whether investment can support exploratory cost-reduction scenarios.
 - [ ] Step 5: Define the modeling question.
@@ -114,7 +112,7 @@ Methodological rule:
 
 - keep the original `km` column untouched;
 - create a new corrected kilometer column;
-- use the corrected kilometer column only for spatial charts and hotspot analysis;
+- use the correct adjusted kilometer column;
 - document the correction before drawing conclusions.
 
 This matters because hotspot analysis can be misleading if the road sequence is interpreted directly from the raw kilometer values.
