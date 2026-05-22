@@ -20,6 +20,7 @@ Working features:
 - Generates initial exploratory charts for fatal crashes, deaths, crash types and kilometer distribution.
 - Organizes the project as an open-source data analysis repository.
 - Prepares the foundation for later investment comparison and machine learning modeling.
+- Adjusts historical investment values using annual IPCA inflation.
 
 ## What Is This?
 
@@ -89,6 +90,8 @@ As of May 21, 2026, this project is a **work in progress**.
 ### In Progress
 
 - [ ] Step 4: Add investment data from `investimentos.csv`.
+- [ ] Adjust investment values using IPCA inflation.
+- [ ] Compare inflation-adjusted investment with next-year fatal crashes.
 
 ### Pending
 
@@ -117,6 +120,16 @@ Methodological rule:
 
 This matters because hotspot analysis can be misleading if the road sequence is interpreted directly from the raw kilometer values.
 
+## Investment Value Adjustment
+
+Investment values are annual nominal amounts. Before comparing investments across years, the project adjusts them for inflation using Brazil's official consumer price index, IPCA.
+
+The inflation source is the IBGE SIDRA table 1737, using the variable "IPCA - Variação acumulada no ano" for December of each year. December is used because it represents the accumulated inflation for the full calendar year.
+
+Investment values will be converted to a common price base before being compared with fatal crash metrics. This avoids comparing nominal amounts from different years as if they had the same purchasing power.
+
+Source: https://apisidra.ibge.gov.br/values/t/1737/n1/1/v/69/p/201012,201112,201212,201312,201412,201512,201612,201712,201812,201912,202012,202112,202212,202312,202412
+
 ## Repository Structure
 
 ```text
@@ -136,7 +149,7 @@ This matters because hotspot analysis can be misleading if the road sequence is 
 |   |   |-- 02_hotspots/
 |   |   |-- 03_investimentos/
 |   |   `-- 04_modelos/
-|   |--01_initial_report.md/
+|   |--01_initial_report.md
 |   `-- artigo/
 |-- src/
 |   |-- data_processing.py
@@ -157,6 +170,7 @@ This matters because hotspot analysis can be misleading if the road sequence is 
 - Fatal crashes are relatively rare compared with total crashes, so future machine learning models must handle class imbalance carefully.
 - Investment and fatal crash reduction must not be interpreted as causal without additional statistical evidence and domain validation.
 - Traffic exposure data, such as AADT or vehicle-kilometers traveled, is not currently included.
+- Investment values must be adjusted for inflation before historical comparison; nominal values alone can be misleading.
 
 ## Semantic Versioning
 
@@ -171,6 +185,6 @@ This repository uses semantic versioning while the project evolves:
 
 ## Next Step
 
-The next development step is to Analyze hotspots by corrected kilometer, road direction and vehicle type and write interpretations about it.
+The next development step is to prepare investment data, adjust historical values using IPCA inflation, and compare inflation-adjusted investment with next-year fatal crash metrics.
 
 *Developed by a Data Scientist / Analyst and Transport Engineer - Luciano Faria.*
