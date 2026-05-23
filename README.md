@@ -73,7 +73,7 @@ The long-term ambition is to estimate whether investment levels appear related t
 
 ## Project Stage
 
-As of May 21, 2026, this project is a **work in progress**.
+As of May 23, 2026, this project is a **work in progress**.
 
 ### Done
 
@@ -86,16 +86,16 @@ As of May 21, 2026, this project is a **work in progress**.
 - [x] Re-run Step 2 charts using the corrected kilometer reference.
 - [x] Compare original kilometer distribution vs corrected kilometer distribution.
 - [x] Step 3: Analyze hotspots by corrected kilometer, road direction and vehicle type.
+- [x] Document the investment-analysis methodology before Step 4.
 
 ### In Progress
 
 - [ ] Step 4: Add investment data from `investimentos.csv`.
 - [ ] Adjust investment values using IPCA inflation.
-- [ ] Compare inflation-adjusted investment with next-year fatal crashes.
+- [ ] Compare inflation-adjusted investment with fatal crashes using lag, rolling-window and before-after exploratory views.
 
 ### Pending
 
-- [ ] Compare investment with fatal crashes using time lag.
 - [ ] Discuss whether investment can support exploratory cost-reduction scenarios.
 - [ ] Step 5: Define the modeling question.
 - [ ] Step 6: Train and evaluate machine learning models.
@@ -130,6 +130,16 @@ Investment values will be converted to a common price base before being compared
 
 Source: https://apisidra.ibge.gov.br/values/t/1737/n1/1/v/69/p/201012,201112,201212,201312,201412,201512,201612,201712,201812,201912,202012,202112,202212,202312,202412
 
+## Investment Analysis Methodology
+
+The investment analysis will not rely only on a simple comparison between investment in year `t` and fatal crashes in year `t + 1`. That one-year lag is useful as an exploratory baseline, but it may be too limited for roadway infrastructure.
+
+Roadway investments can have persistent effects. Pavement rehabilitation, new lanes, shoulders, safety devices, drainage, signage and geometry improvements may change the road risk level for several years. For this reason, Step 4 will also evaluate whether high-investment periods are associated with later changes in the fatal-crash baseline.
+
+The analysis will include annual corrected investment, annual fatal crashes, combined charts, simple lag tests, rolling or accumulated investment windows and before-after comparisons around the highest-investment years.
+
+This methodological note is documented in `reports/02_investment_methodology_note.md`.
+
 ## Repository Structure
 
 ```text
@@ -150,6 +160,7 @@ Source: https://apisidra.ibge.gov.br/values/t/1737/n1/1/v/69/p/201012,201112,201
 |   |   |-- 03_investimentos/
 |   |   `-- 04_modelos/
 |   |--01_initial_report.md
+|   |--02_investment_methodology_note.md
 |   `-- artigo/
 |-- src/
 |   |-- data_processing.py
@@ -165,6 +176,7 @@ Source: https://apisidra.ibge.gov.br/values/t/1737/n1/1/v/69/p/201012,201112,201
 
 - The project is still in progress, so conclusions are preliminary.
 - The investment dataset is annual and aggregated by concessionaire; it does not show exactly where each investment was applied.
+- A simple one-year lag may not capture persistent effects from infrastructure investment.
 - The crash dataset has a kilometer discontinuity that required a corrected spatial reference.
 - The year 2026 may be partial and should not be compared directly with complete years without adjustment.
 - Fatal crashes are relatively rare compared with total crashes, so future machine learning models must handle class imbalance carefully.
@@ -185,6 +197,6 @@ This repository uses semantic versioning while the project evolves:
 
 ## Next Step
 
-The next development step is to prepare investment data, adjust historical values using IPCA inflation, and compare inflation-adjusted investment with next-year fatal crash metrics.
+The next development step is to prepare investment data, adjust historical values using IPCA inflation, and compare inflation-adjusted investment with fatal crash metrics using lag, rolling-window and before-after exploratory views.
 
 *Developed by a Data Scientist / Analyst and Transport Engineer - Luciano Faria.*
