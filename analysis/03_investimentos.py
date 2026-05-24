@@ -101,4 +101,111 @@ plt.tight_layout()
 plt.savefig('../reports/figures/03_investimentos/media_valores_ano.png')
 
 
-print(df_aux0)
+def classificar_fase(ano):
+    if ano <= 2014:
+        return '2010-2014 estrutural'
+    if ano <= 2020:
+        return '2015-2020 madura'
+    return '2021-2025 final'
+
+df_aux0['fase'] = [classificar_fase(ano) for ano in df_aux0.index]
+ordem_fases = ['2010-2014 estrutural', '2015-2020 madura', '2021-2025 final']
+
+fig, ax4b = plt.subplots(figsize=(12,6))
+ax4b.plot(df_aux0.index, df_aux0['valor_corrigido'], color='green', marker='o', linestyle='-', label='Investimento Corrigido')
+ax4b.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f'R$ {x/1_000_000:.0f} Mi'))
+ax4b.set_ylabel('Investimento Corrigido')
+ax4b.set_xlabel('Ano')
+ax4b.set_xticks(df_aux0.index)
+ax4b.tick_params(axis='x', rotation=45)
+ax4b.axvspan(2010, 2014, color='green', alpha=0.08, label='Fase estrutural')
+ax4b.axvspan(2015, 2020, color='blue', alpha=0.06, label='Fase madura')
+ax4b.axvspan(2021, 2025, color='orange', alpha=0.08, label='Fase final')
+
+ax4b_2 = ax4b.twinx()
+ax4b_2.plot(df_aux0.index, df_aux0['acidente_fatal'], color='red', marker='x', linestyle='-', label='Acidentes Fatais')
+ax4b_2.set_ylabel('Acidentes Fatais')
+
+linhas_1, labels_1 = ax4b.get_legend_handles_labels()
+linhas_2, labels_2 = ax4b_2.get_legend_handles_labels()
+ax4b.legend(linhas_1 + linhas_2, labels_1 + labels_2, loc='upper right')
+plt.title('Fase 4.b - Investimento corrigido x acidentes fatais por fase')
+plt.tight_layout()
+plt.savefig('../reports/figures/03_investimentos/4b_investimento_acidentes_por_fase.png')
+plt.close()
+
+resumo_fases = (
+    df_aux0
+    .groupby('fase')
+    .agg(
+        media_acidentes_fatais=('acidente_fatal', 'mean'),
+        media_investimento_corrigido=('valor_corrigido', 'mean')
+    )
+    .reindex(ordem_fases)
+)
+
+fig, axes = plt.subplots(1, 2, figsize=(14,6))
+axes[0].bar(resumo_fases.index, resumo_fases['media_acidentes_fatais'], color='red')
+axes[0].set_title('Media de acidentes fatais por fase')
+axes[0].set_ylabel('Acidentes Fatais')
+axes[0].tick_params(axis='x', rotation=30)
+
+axes[1].bar(resumo_fases.index, resumo_fases['media_investimento_corrigido'], color='green')
+axes[1].set_title('Media de investimento corrigido por fase')
+axes[1].set_ylabel('Investimento Corrigido')
+axes[1].tick_params(axis='x', rotation=30)
+axes[1].yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f'R$ {x/1_000_000:.0f} Mi'))
+
+plt.tight_layout()
+plt.savefig('../reports/figures/03_investimentos/4b_medias_por_fase.png')
+plt.close()
+
+cores_fases = {
+    '2010-2014 estrutural': 'green',
+    '2015-2020 madura': 'blue',
+    '2021-2025 final': 'orange'
+}
+
+fig, ax_lag = plt.subplots(figsize=(12,6))
+for fase in ordem_fases:
+    dados_fase = df_aux0[df_aux0['fase'] == fase].dropna(subset=['investimento_ano_anterior', 'acidente_fatal'])
+    ax_lag.scatter(
+        dados_fase['investimento_ano_anterior'],
+        dados_fase['acidente_fatal'],
+        color=cores_fases[fase],
+        label=fase
+    )
+    for ano, x, y in zip(dados_fase.index, dados_fase['investimento_ano_anterior'], dados_fase['acidente_fatal']):
+        ax_lag.text(x, y, str(ano))
+
+ax_lag.xaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f'R$ {x/1_000_000:.0f} Mi'))
+ax_lag.set_xlabel('Investimento corrigido do ano anterior')
+ax_lag.set_ylabel('Acidentes Fatais')
+ax_lag.set_title('Fase 4.b - Lag 1 por fase')
+ax_lag.legend(title='Fase')
+plt.tight_layout()
+plt.savefig('../reports/figures/03_investimentos/4b_lag1_por_fase.png')
+plt.close()
+
+fig, ax_roll = plt.subplots(figsize=(12,6))
+ax_roll.plot(df_aux0.index, df_aux0['soma_movel3'], color='green', marker='o', linestyle='-', label='Investimento acumulado 3 anos')
+ax_roll.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f'R$ {x/1_000_000:.0f} Mi'))
+ax_roll.set_ylabel('Investimento acumulado 3 anos')
+ax_roll.set_xlabel('Ano')
+ax_roll.set_xticks(df_aux0.index)
+ax_roll.tick_params(axis='x', rotation=45)
+ax_roll.axvspan(2010, 2014, color='green', alpha=0.08)
+ax_roll.axvspan(2015, 2020, color='blue', alpha=0.06)
+ax_roll.axvspan(2021, 2025, color='orange', alpha=0.08)
+
+ax_roll2 = ax_roll.twinx()
+ax_roll2.plot(df_aux0.index, df_aux0['acidente_fatal'], color='red', marker='x', linestyle='-', label='Acidentes Fatais')
+ax_roll2.set_ylabel('Acidentes Fatais')
+
+linhas_roll_1, labels_roll_1 = ax_roll.get_legend_handles_labels()
+linhas_roll_2, labels_roll_2 = ax_roll2.get_legend_handles_labels()
+ax_roll.legend(linhas_roll_1 + linhas_roll_2, labels_roll_1 + labels_roll_2, loc='upper right')
+plt.title('Fase 4.b - Investimento acumulado 3 anos x acidentes fatais')
+plt.tight_layout()
+plt.savefig('../reports/figures/03_investimentos/4b_investimento_3anos_acidentes_por_fase.png')
+plt.close()
