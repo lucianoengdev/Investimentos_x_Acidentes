@@ -19,6 +19,7 @@ data/processed/*.parquet
 .env
 .DS_Store
 Thumbs.db
+reports/private_research_links.md
 
 # Reports generated during analysis
 reports/figures/**/*.png
