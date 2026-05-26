@@ -7,7 +7,7 @@
 ![Seaborn](https://img.shields.io/badge/Seaborn-4C72B0?style=for-the-badge)
 ![scikit--learn](https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white)
 
-**Current version:** `v0.3.0-alpha`
+**Current version:** `v0.4.0-alpha`
 
 ## What This Does
 
@@ -18,9 +18,10 @@ Working features:
 - Loads and cleans traffic crash data.
 - Preserves the original kilometer marker and creates a corrected linear kilometer reference.
 - Generates initial exploratory charts for fatal crashes, deaths, crash types and kilometer distribution.
-- Organizes the project as an open-source data analysis repository.
-- Prepares the foundation for later investment comparison and machine learning modeling.
 - Adjusts historical investment values using annual IPCA inflation.
+- Compares investment and fatal-crash patterns across concession phases.
+- Documents hotspot, vehicle, crash-type and investment findings for a technical article.
+- Keeps fatal-crash machine learning as a future complementary extension.
 
 ## What Is This?
 
@@ -32,7 +33,8 @@ The code is expected to produce:
 - exploratory charts in `reports/figures/`;
 - documented analysis scripts in `analysis/`;
 - reusable data-processing and visualization functions in `src/`;
-- a future technical article about fatal crashes, investment and roadway safety.
+- a technical article about fatal crashes, investment and roadway safety;
+- a future optional machine learning extension at occurrence level.
 
 The main analytical metric is:
 
@@ -53,7 +55,7 @@ acidente_fatal = mortos > 0
 - **NumPy**: numerical operations.
 - **Matplotlib**: static chart generation.
 - **Seaborn**: exploratory statistical visualizations.
-- **scikit-learn**: planned machine learning models.
+- **scikit-learn**: planned future complementary machine learning extension.
 - **Git / GitHub Desktop**: version control workflow.
 - **VS Code**: development environment.
 
@@ -66,14 +68,14 @@ The goal is to build a complete transportation data project. The project is not 
 3. generate exploratory charts;
 4. interpret the results before modeling;
 5. compare crash patterns with roadway investment;
-6. test predictive models carefully;
-7. write a public technical article with conclusions and limitations.
+6. write a public technical article with conclusions and limitations;
+7. optionally extend the repository with occurrence-level fatal-crash classification.
 
-The long-term ambition is to estimate whether investment levels appear related to fatal crash reduction, while being careful not to claim causality without enough evidence.
+The primary goal is to produce a transparent exploratory analysis of how fatal crashes, dangerous locations, crash types and historical investment patterns relate on the BR-381 / Fernao Dias corridor, while being careful not to claim causality without enough evidence. Machine learning is a later complementary path rather than part of the article's core scope.
 
 ## Project Stage
 
-As of May 23, 2026, this project is a **work in progress**.
+This project is a **work in progress**.
 
 ### Done
 
@@ -87,19 +89,18 @@ As of May 23, 2026, this project is a **work in progress**.
 - [x] Compare original kilometer distribution vs corrected kilometer distribution.
 - [x] Step 3: Analyze hotspots by corrected kilometer, road direction and vehicle type.
 - [x] Document the investment-analysis methodology before Step 4.
+- [x] Step 4: Prepare and adjust investment data using IPCA inflation.
+- [x] Compare corrected investment with fatal crashes using overall and phase-based exploratory views.
+- [x] Document the conclusion and the limits of estimating investment effects.
 
 ### In Progress
 
-- [ ] Step 4: Add investment data from `investimentos.csv`.
-- [ ] Adjust investment values using IPCA inflation.
-- [ ] Compare inflation-adjusted investment with fatal crashes using lag, rolling-window and before-after exploratory views.
+- [ ] Write the technical article from the exploratory analysis and documented findings.
 
-### Pending
+### Future Extension
 
-- [ ] Discuss whether investment can support exploratory cost-reduction scenarios.
-- [ ] Step 5: Define the modeling question.
-- [ ] Step 6: Train and evaluate machine learning models.
-- [ ] Step 7: Write the final README updates and technical article.
+- [ ] Define an occurrence-level fatal-crash classification question.
+- [ ] Train and evaluate machine learning models as a complementary repository extension.
 
 ## Kilometer Correction
 
@@ -132,13 +133,28 @@ Source: https://apisidra.ibge.gov.br/values/t/1737/n1/1/v/69/p/201012,201112,201
 
 ## Investment Analysis Methodology
 
-The investment analysis will not rely only on a simple comparison between investment in year `t` and fatal crashes in year `t + 1`. That one-year lag is useful as an exploratory baseline, but it may be too limited for roadway infrastructure.
+The investment analysis does not rely only on a simple comparison between investment in year `t` and fatal crashes in year `t + 1`. That one-year lag is useful as an exploratory view, but it is too limited to describe roadway infrastructure effects by itself.
 
-Roadway investments can have persistent effects. Pavement rehabilitation, new lanes, shoulders, safety devices, drainage, signage and geometry improvements may change the road risk level for several years. For this reason, Step 4 will also evaluate whether high-investment periods are associated with later changes in the fatal-crash baseline.
+Roadway investments can have persistent effects. Pavement rehabilitation, new lanes, shoulders, safety devices, drainage, signage and geometry improvements may change the road risk level for several years. For this reason, Step 4 evaluates whether high-investment periods are associated with later changes in the fatal-crash baseline.
 
-The analysis will include annual corrected investment, annual fatal crashes, combined charts, simple lag tests, rolling or accumulated investment windows and before-after comparisons around the highest-investment years.
+The analysis includes annual corrected investment, annual fatal crashes, combined charts, simple lag views, rolling or accumulated investment windows and phase-based comparisons around high-investment periods.
 
 This methodological note is documented in `reports/02_investment_methodology_note.md`.
+
+## Article Scope And Modeling Extension
+
+The article produced from this repository focuses on the exploratory findings developed so far:
+
+- changes in fatal-crash levels over time;
+- dangerous kilometer zones using a corrected linear road reference;
+- crash types and vehicle patterns associated with higher mortality;
+- inflation-adjusted investment levels;
+- investment phases and possible persistent roadway-safety effects;
+- documentary evidence about roadway works and concession context.
+
+The available investment series is annual and too limited to estimate reliably how much money would be required to reduce a specified number of fatal crashes. Therefore, the article treats investment findings as exploratory associations and methodological evidence, not as a causal prediction model.
+
+After the article analysis, the repository may be extended with machine learning at occurrence level. That complementary work will investigate whether a crash is fatal from features such as crash type, vehicle involvement, corrected kilometer range and temporal or road characteristics. It is intentionally outside the core investment-versus-crashes article scope.
 
 ## Repository Structure
 
@@ -161,6 +177,7 @@ This methodological note is documented in `reports/02_investment_methodology_not
 |   |   `-- 04_modelos/
 |   |--01_initial_report.md
 |   |--02_investment_methodology_note.md
+|   |--03_conclusion_after_phase4.md
 |   `-- artigo/
 |-- src/
 |   |-- data_processing.py
@@ -179,7 +196,7 @@ This methodological note is documented in `reports/02_investment_methodology_not
 - A simple one-year lag may not capture persistent effects from infrastructure investment.
 - The crash dataset has a kilometer discontinuity that required a corrected spatial reference.
 - The year 2026 may be partial and should not be compared directly with complete years without adjustment.
-- Fatal crashes are relatively rare compared with total crashes, so future machine learning models must handle class imbalance carefully.
+- Fatal crashes are relatively rare compared with total crashes; any future machine learning extension must handle class imbalance carefully.
 - Investment and fatal crash reduction must not be interpreted as causal without additional statistical evidence and domain validation.
 - Traffic exposure data, such as AADT or vehicle-kilometers traveled, is not currently included.
 - Investment values must be adjusted for inflation before historical comparison; nominal values alone can be misleading.
@@ -190,13 +207,14 @@ This repository uses semantic versioning while the project evolves:
 
 - `v0.1.0-alpha`: initial project structure and raw data exploration.
 - `v0.2.0-alpha`: initial charts completed and kilometer correction added.
-- `v0.3.0-alpha`: planned hotspot analysis using corrected kilometer reference.
-- `v0.4.0-alpha`: planned investment comparison.
-- `v0.5.0-alpha`: planned machine learning baseline.
-- `v1.0.0`: planned first complete public analysis and article.
+- `v0.3.0-alpha`: hotspot analysis using corrected kilometer reference.
+- `v0.4.0-alpha`: investment comparison, phase analysis and article preparation.
+- `v0.5.0-alpha`: planned article completion and public analysis refinement.
+- `v1.0.0`: planned first complete public exploratory analysis and article.
+- Future extension: occurrence-level machine learning baseline.
 
 ## Next Step
 
-The next development step is to prepare investment data, adjust historical values using IPCA inflation, and compare inflation-adjusted investment with fatal crash metrics using lag, rolling-window and before-after exploratory views.
+The next development step is to consolidate the exploratory findings, figures, methodology and limitations into the technical article. Occurrence-level machine learning remains a future complementary extension of the repository.
 
 *Developed by a Data Scientist / Analyst and Transport Engineer - Luciano Faria.*
