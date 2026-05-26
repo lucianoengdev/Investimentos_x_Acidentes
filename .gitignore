@@ -11,18 +11,8 @@ __pycache__/
 venv/
 env/
 
-# Data outputs
-data/processed/*.csv
-data/processed/*.parquet
-
 # Local/private files
 .env
 .DS_Store
 Thumbs.db
 reports/private_research_links.md
-
-# Reports generated during analysis
-reports/figures/**/*.png
-reports/figures/**/*.jpg
-reports/figures/**/*.svg
-reports/figures/**/*.pdf
