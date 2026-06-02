@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OneHotEncoder
 
 df = pd.read_csv('../data/processed/acidentes_tratados.csv')
 
@@ -25,9 +26,11 @@ df['hora_cos'] = np.cos(2 * np.pi * minutos / 1440)
 df['hour'] = df['horario'].dt.hour
 df['bin_hora'] = pd.cut(df['hour'], bins=range(0, 25), labels=False, right=False)
 
-print(df.columns)
-print(df.head())
-print(df.describe())
+# SUL = 0 / NORTE = 1 
+df['sentido'] = df['sentido'].replace({'Sul': 0, 'Crescente': 0, 'Norte': 1, 'Decrescente': 1})
+# df_try = ((df['sentido'] != 0) & (df['sentido'] != 1)).sum() -> Confirmei se sobrou coluna diferente e nao sobrou
+
+# OneHotEncoder para trecho e tipo de acidente
 
 
 X = df.drop(columns = 'acidente_fatal')
