@@ -31,7 +31,30 @@ df['sentido'] = df['sentido'].replace({'Sul': 0, 'Crescente': 0, 'Norte': 1, 'De
 # df_try = ((df['sentido'] != 0) & (df['sentido'] != 1)).sum() -> Confirmei se sobrou coluna diferente e nao sobrou
 
 # OneHotEncoder para trecho e tipo de acidente
+encoder = OneHotEncoder(sparse_output=False)
+encoded = encoder.fit_transform(df[['trecho']])
+df_encoded = pd.DataFrame(encoded, columns=encoder.get_feature_names_out(["trecho"]))
+df = pd.concat([df, df_encoded], axis=1)
 
+df['tipo_de_acidente'] = (
+    df['tipo_de_acidente']
+    .str.lower()
+    .str.strip()
+    .str.normalize('NFKD')
+    .str.encode('ascii', errors='ignore')
+    .str.decode('utf-8')
+    .str.replace('-', '_', regex=False)
+    .str.replace(r'\s+', '_', regex=True)
+    .str.replace(r'_+', '_', regex=True)
+)
+df.loc[df['tipo_de_acidente'].str.contains('atropelamento'), 'tipo_de_acidente'] = 'atropelamento'
+encoded = encoder.fit_transform(df[['tipo_de_acidente']])
+df_encoded = pd.DataFrame(encoded, columns=encoder.get_feature_names_out(['tipo_de_acidente']))
+df = pd.concat([df, df_encoded], axis=1)
+df = df.drop(columns = ['trecho', 'tipo_de_acidente'])
+
+print(df.head(15))
+print(df.columns)
 
 X = df.drop(columns = 'acidente_fatal')
 y = df['acidente_fatal']
