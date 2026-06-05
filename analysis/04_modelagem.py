@@ -1,7 +1,11 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+from pathlib import Path
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.dummy import DummyClassifier
+from sklearn.metrics import accuracy_score, ConfusionMatrixDisplay
 
 df = pd.read_csv('../data/processed/acidentes_tratados.csv')
 
@@ -48,15 +52,54 @@ df['tipo_de_acidente'] = (
     .str.replace(r'_+', '_', regex=True)
 )
 df.loc[df['tipo_de_acidente'].str.contains('atropelamento'), 'tipo_de_acidente'] = 'atropelamento'
+df.loc[df['tipo_de_acidente'].str.contains('choque'), 'tipo_de_acidente'] = 'choque'
+df.loc[df['tipo_de_acidente'].str.contains('colisao'), 'tipo_de_acidente'] = 'colisao'
+manter = ['atropelamento', 'choque', 'colisao', 'tombamento', 'engavetamento', 'capotamento']
+df.loc[~df['tipo_de_acidente'].isin(manter), 'tipo_de_acidente'] = 'outros'
+
 encoded = encoder.fit_transform(df[['tipo_de_acidente']])
 df_encoded = pd.DataFrame(encoded, columns=encoder.get_feature_names_out(['tipo_de_acidente']))
 df = pd.concat([df, df_encoded], axis=1)
 df = df.drop(columns = ['trecho', 'tipo_de_acidente'])
 
-print(df.head(15))
-print(df.columns)
-
 X = df.drop(columns = 'acidente_fatal')
 y = df['acidente_fatal']
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, stratify = y, random_state = 42)
+
+dummy = DummyClassifier(strategy='most_frequent')
+dummy.fit(X_train, y_train)
+y_pred_dummy = dummy.predict(X_test)
+accuracy_test = accuracy_score(y_test, y_pred_dummy)
+
+print("Acurácia Dummy:", accuracy_test)
+print("Distribuição y_test:")
+print(y_test.value_counts(normalize=True))
+
+fig_dir = Path('../reports/figures/04_modelos')
+fig_dir.mkdir(parents=True, exist_ok=True)
+
+ConfusionMatrixDisplay.from_predictions(
+    y_test,
+    y_pred_dummy,
+    display_labels=['Nao fatal', 'Fatal'],
+    cmap='Blues'
+)
+plt.title('Matriz de confusao - DummyClassifier most_frequent')
+plt.tight_layout()
+plt.savefig(fig_dir / 'dummy_confusion_matrix.png')
+plt.close()
+
+distribuicao_dummy = pd.DataFrame({
+    'Real': y_test.value_counts(normalize=True).sort_index(),
+    'Previsto pelo Dummy': pd.Series(y_pred_dummy).value_counts(normalize=True).sort_index()
+}).fillna(0)
+
+distribuicao_dummy.plot(kind='bar', figsize=(8, 5))
+plt.title('Distribuicao real x previsao Dummy')
+plt.xlabel('Classe')
+plt.ylabel('Proporcao')
+plt.xticks(ticks=[0, 1], labels=['Nao fatal', 'Fatal'], rotation=0)
+plt.tight_layout()
+plt.savefig(fig_dir / 'dummy_class_distribution.png')
+plt.close()
