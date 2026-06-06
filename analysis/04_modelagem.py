@@ -4,8 +4,9 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.linear_model import LogisticRegression
 from sklearn.dummy import DummyClassifier
-from sklearn.metrics import accuracy_score, ConfusionMatrixDisplay
+from sklearn.metrics import classification_report, accuracy_score, ConfusionMatrixDisplay, confusion_matrix
 
 df = pd.read_csv('../data/processed/acidentes_tratados.csv')
 
@@ -20,7 +21,7 @@ col_trash = ['data', 'km', 'tipo_de_ocorrencia', 'n_da_ocorrencia', 'ilesos', 'l
 df = df.drop(col_trash, axis=1)
 df['tipo_de_acidente'] = (df['tipo_de_acidente'].replace('', 'Não informado').fillna('Não informado'))
 bin20 = range(0, int(df['km_ajustado'].max()) + 20, 20)
-df['km_bin'] = pd.cut(df['km_ajustado'], bins=bin20, include_lowest=True)
+df['km_bin_id'] = pd.cut(df['km_ajustado'], bins=bin20, include_lowest=True, labels=False)
 
 df['horario'] = pd.to_datetime(df['horario'], format='%H:%M:%S')
 minutos = (df['horario'].dt.hour * 60 + df['horario'].dt.minute)
@@ -29,6 +30,7 @@ df['hora_cos'] = np.cos(2 * np.pi * minutos / 1440)
 
 df['hour'] = df['horario'].dt.hour
 df['bin_hora'] = pd.cut(df['hour'], bins=range(0, 25), labels=False, right=False)
+df = df.drop(columns='horario')
 
 # SUL = 0 / NORTE = 1 
 df['sentido'] = df['sentido'].replace({'Sul': 0, 'Crescente': 0, 'Norte': 1, 'Decrescente': 1})
@@ -67,7 +69,7 @@ y = df['acidente_fatal']
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, stratify = y, random_state = 42)
 
-dummy = DummyClassifier(strategy='most_frequent')
+"""dummy = DummyClassifier(strategy='most_frequent')
 dummy.fit(X_train, y_train)
 y_pred_dummy = dummy.predict(X_test)
 accuracy_test = accuracy_score(y_test, y_pred_dummy)
@@ -103,3 +105,22 @@ plt.xticks(ticks=[0, 1], labels=['Nao fatal', 'Fatal'], rotation=0)
 plt.tight_layout()
 plt.savefig(fig_dir / 'dummy_class_distribution.png')
 plt.close()
+
+Acurácia Dummy: 0.98430004361099
+Distribuição y_test:
+acidente_fatal
+0    0.9843
+1    0.0157
+Name: proportion, dtype: float64
+(venv) 
+
+"""
+
+model = LogisticRegression(max_iter = 1000, class_weight='balanced')
+model.fit(X_train, y_train)
+
+y_log_pred = model.predict(X_test)
+
+print("Acurácia:", accuracy_score(y_test, y_log_pred))
+print(confusion_matrix(y_test, y_log_pred))
+print(classification_report(y_test, y_log_pred))
