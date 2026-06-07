@@ -53,10 +53,12 @@ df['tipo_de_acidente'] = (
     .str.replace(r'\s+', '_', regex=True)
     .str.replace(r'_+', '_', regex=True)
 )
-df.loc[df['tipo_de_acidente'].str.contains('atropelamento'), 'tipo_de_acidente'] = 'atropelamento'
+# df.loc[df['tipo_de_acidente'].str.contains('atropelamento'), 'tipo_de_acidente'] = 'atropelamento'
 df.loc[df['tipo_de_acidente'].str.contains('choque'), 'tipo_de_acidente'] = 'choque'
 df.loc[df['tipo_de_acidente'].str.contains('colisao'), 'tipo_de_acidente'] = 'colisao'
-manter = ['atropelamento', 'choque', 'colisao', 'tombamento', 'engavetamento', 'capotamento']
+manter_atropelamento = ['atropelamento_de_pedestre', 'atropelamento_morador', 'atropelamento_andarilho']
+df.loc[df['tipo_de_acidente'].str.contains('atropelamento') & ~df['tipo_de_acidente'].isin(manter_atropelamento), 'tipo_de_acidente'] = 'atropelamento_outros'
+manter = ['atropelamento_de_pedestre', 'atropelamento_morador', 'atropelamento_andarilho', 'atropelamento_outros', 'choque', 'colisao', 'tombamento', 'engavetamento', 'capotamento']
 df.loc[~df['tipo_de_acidente'].isin(manter), 'tipo_de_acidente'] = 'outros'
 
 encoded = encoder.fit_transform(df[['tipo_de_acidente']])
@@ -112,8 +114,6 @@ acidente_fatal
 0    0.9843
 1    0.0157
 Name: proportion, dtype: float64
-(venv) 
-
 """
 
 col_normalizar = ['km_ajustado', 'ano']
@@ -240,4 +240,90 @@ Acurácia: 0.9519188835586568
     accuracy                           0.95     27516
    macro avg       0.57      0.69      0.60     27516
 weighted avg       0.98      0.95      0.96     27516
+
+A separação dos tipos de atropelamento melhorou a qualidade do modelo, principalmente no threshold 0.8, reduzindo falsos positivos e aumentando o F1-score da classe fatal. Isso confirma que a engenharia de features baseada na análise exploratória pode melhorar a capacidade do modelo de diferenciar acidentes fatais e não fatais. Segue resultado abaixo:
+
+thresholds:  0.3
+-------------------------
+Acurácia: 0.592891408634976
+[[15918 11166]
+ [   36   396]]
+              precision    recall  f1-score   support
+
+           0       1.00      0.59      0.74     27084
+           1       0.03      0.92      0.07       432
+
+    accuracy                           0.59     27516
+   macro avg       0.52      0.75      0.40     27516
+weighted avg       0.98      0.59      0.73     27516
+
+thresholds:  0.4
+-------------------------
+Acurácia: 0.7078063672045355
+[[19115  7969]
+ [   71   361]]
+              precision    recall  f1-score   support
+
+           0       1.00      0.71      0.83     27084
+           1       0.04      0.84      0.08       432
+
+    accuracy                           0.71     27516
+   macro avg       0.52      0.77      0.45     27516
+weighted avg       0.98      0.71      0.81     27516
+
+thresholds:  0.5
+-------------------------
+Acurácia: 0.8013519406890537
+[[21729  5355]
+ [  111   321]]
+              precision    recall  f1-score   support
+
+           0       0.99      0.80      0.89     27084
+           1       0.06      0.74      0.11       432
+
+    accuracy                           0.80     27516
+   macro avg       0.53      0.77      0.50     27516
+weighted avg       0.98      0.80      0.88     27516
+
+thresholds:  0.6
+-------------------------
+Acurácia: 0.8740005814798663
+[[23769  3315]
+ [  152   280]]
+              precision    recall  f1-score   support
+
+           0       0.99      0.88      0.93     27084
+           1       0.08      0.65      0.14       432
+
+    accuracy                           0.87     27516
+   macro avg       0.54      0.76      0.54     27516
+weighted avg       0.98      0.87      0.92     27516
+
+thresholds:  0.7
+-------------------------
+Acurácia: 0.9277147841255996
+[[25295  1789]
+ [  200   232]]
+              precision    recall  f1-score   support
+
+           0       0.99      0.93      0.96     27084
+           1       0.11      0.54      0.19       432
+
+    accuracy                           0.93     27516
+   macro avg       0.55      0.74      0.58     27516
+weighted avg       0.98      0.93      0.95     27516
+
+thresholds:  0.8
+-------------------------
+Acurácia: 0.961404273877017
+[[26277   807]
+ [  255   177]]
+              precision    recall  f1-score   support
+
+           0       0.99      0.97      0.98     27084
+           1       0.18      0.41      0.25       432
+
+    accuracy                           0.96     27516
+   macro avg       0.59      0.69      0.62     27516
+weighted avg       0.98      0.96      0.97     27516
 """
