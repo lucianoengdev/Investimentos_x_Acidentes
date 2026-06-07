@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pathlib import Path
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import classification_report, accuracy_score, ConfusionMatrixDisplay, confusion_matrix
@@ -116,11 +116,128 @@ Name: proportion, dtype: float64
 
 """
 
+col_normalizar = ['km_ajustado', 'ano']
+
+scaler = MinMaxScaler()
+
+X_train[col_normalizar] = scaler.fit_transform(X_train[col_normalizar])
+X_test[col_normalizar] = scaler.transform(X_test[col_normalizar])
+
 model = LogisticRegression(max_iter = 1000, class_weight='balanced')
 model.fit(X_train, y_train)
 
-y_log_pred = model.predict(X_test)
 
-print("Acurácia:", accuracy_score(y_test, y_log_pred))
-print(confusion_matrix(y_test, y_log_pred))
-print(classification_report(y_test, y_log_pred))
+y_proba_fatal = model.predict_proba(X_test)[:,1]
+
+thresholds = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+
+for threshold in thresholds:
+
+    print("thresholds: ", threshold)
+    print("-------------------------")
+
+    y_pred_threshold = (y_proba_fatal >= threshold).astype(int)
+    
+    print("Acurácia:", accuracy_score(y_test, y_pred_threshold))
+    print(confusion_matrix(y_test, y_pred_threshold))
+    print(classification_report(y_test, y_pred_threshold))
+    
+"""
+Teste 1 - Logistic Regression                               # y_log_pred = model.predict(X_test)
+Acurácia: 0.800770460822794
+[[21713  5371]
+ [  111   321]]
+              precision    recall  f1-score   support
+
+           0       0.99      0.80      0.89     27084
+           1       0.06      0.74      0.10       432
+
+    accuracy                           0.80     27516
+   macro avg       0.53      0.77      0.50     27516
+weighted avg       0.98      0.80      0.88     27516
+
+Teste 2 - thresholds
+thresholds:  0.3
+-------------------------
+Acurácia: 0.5912559965111208
+[[15873 11211]
+ [   36   396]]
+              precision    recall  f1-score   support
+
+           0       1.00      0.59      0.74     27084
+           1       0.03      0.92      0.07       432
+
+    accuracy                           0.59     27516
+   macro avg       0.52      0.75      0.40     27516
+weighted avg       0.98      0.59      0.73     27516
+
+thresholds:  0.4
+-------------------------
+Acurácia: 0.7075156272714057
+[[19109  7975]
+ [   73   359]]
+              precision    recall  f1-score   support
+
+           0       1.00      0.71      0.83     27084
+           1       0.04      0.83      0.08       432
+
+    accuracy                           0.71     27516
+   macro avg       0.52      0.77      0.45     27516
+weighted avg       0.98      0.71      0.81     27516
+
+thresholds:  0.5
+-------------------------
+Acurácia: 0.800770460822794
+[[21713  5371]
+ [  111   321]]
+              precision    recall  f1-score   support
+
+           0       0.99      0.80      0.89     27084
+           1       0.06      0.74      0.10       432
+
+    accuracy                           0.80     27516
+   macro avg       0.53      0.77      0.50     27516
+weighted avg       0.98      0.80      0.88     27516
+
+thresholds:  0.6
+-------------------------
+Acurácia: 0.872837621747347
+[[23740  3344]
+ [  155   277]]
+              precision    recall  f1-score   support
+
+           0       0.99      0.88      0.93     27084
+           1       0.08      0.64      0.14       432
+
+    accuracy                           0.87     27516
+   macro avg       0.54      0.76      0.53     27516
+weighted avg       0.98      0.87      0.92     27516
+
+thresholds:  0.7
+-------------------------
+Acurácia: 0.9233900276202937
+[[25171  1913]
+ [  195   237]]
+              precision    recall  f1-score   support
+
+           0       0.99      0.93      0.96     27084
+           1       0.11      0.55      0.18       432
+
+    accuracy                           0.92     27516
+   macro avg       0.55      0.74      0.57     27516
+weighted avg       0.98      0.92      0.95     27516
+
+thresholds:  0.8
+-------------------------
+Acurácia: 0.9519188835586568
+[[26011  1073]
+ [  250   182]]
+              precision    recall  f1-score   support
+
+           0       0.99      0.96      0.98     27084
+           1       0.15      0.42      0.22       432
+
+    accuracy                           0.95     27516
+   macro avg       0.57      0.69      0.60     27516
+weighted avg       0.98      0.95      0.96     27516
+"""
