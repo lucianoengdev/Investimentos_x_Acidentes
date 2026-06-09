@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.dummy import DummyClassifier
-from sklearn.metrics import classification_report, accuracy_score, ConfusionMatrixDisplay, confusion_matrix
+from sklearn.metrics import classification_report, accuracy_score, ConfusionMatrixDisplay, confusion_matrix, precision_score, recall_score, f1_score
 
 df = pd.read_csv('../data/processed/acidentes_tratados.csv')
 
@@ -71,6 +71,9 @@ y = df['acidente_fatal']
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, stratify = y, random_state = 42)
 
+
+fig_dir = Path('../reports/figures/04_modelos')
+fig_dir.mkdir(parents=True, exist_ok=True)
 """dummy = DummyClassifier(strategy='most_frequent')
 dummy.fit(X_train, y_train)
 y_pred_dummy = dummy.predict(X_test)
@@ -79,9 +82,6 @@ accuracy_test = accuracy_score(y_test, y_pred_dummy)
 print("Acurácia Dummy:", accuracy_test)
 print("Distribuição y_test:")
 print(y_test.value_counts(normalize=True))
-
-fig_dir = Path('../reports/figures/04_modelos')
-fig_dir.mkdir(parents=True, exist_ok=True)
 
 ConfusionMatrixDisplay.from_predictions(
     y_test,
@@ -131,17 +131,43 @@ y_proba_fatal = model.predict_proba(X_test)[:,1]
 
 thresholds = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
 
+precisions = []
+recalls = []
+f1_scores = []
+
 for threshold in thresholds:
-
-    print("thresholds: ", threshold)
-    print("-------------------------")
-
     y_pred_threshold = (y_proba_fatal >= threshold).astype(int)
-    
-    print("Acurácia:", accuracy_score(y_test, y_pred_threshold))
-    print(confusion_matrix(y_test, y_pred_threshold))
-    print(classification_report(y_test, y_pred_threshold))
-    
+
+    precisions.append(precision_score(y_test, y_pred_threshold))
+    recalls.append(recall_score(y_test, y_pred_threshold))
+    f1_scores.append(f1_score(y_test, y_pred_threshold))
+
+plt.figure(figsize=(10,6))
+plt.plot(thresholds, precisions, marker = 'o', label = 'Precision')
+plt.plot(thresholds, recalls, marker = 'o', label = 'Recall')
+plt.plot(thresholds, f1_scores, marker = 'o', label = 'F1-Score')
+plt.xlabel('Threshold')
+plt.ylabel('Score')
+plt.title('Precision, Recall e F1 por threshold')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig(fig_dir / 'precision_recall_f1.png')
+
+thresholds_cm = [0.5, 0.6, 0.7, 0.8]
+
+fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+
+for threshold, ax in zip(thresholds_cm, axes.flatten()):
+    y_pred_threshold = (y_proba_fatal >= threshold).astype(int)
+    cm = confusion_matrix(y_test, y_pred_threshold)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['Nao fatal', 'Fatal'])
+    disp.plot(ax=ax, cmap='Blues', values_format='d', colorbar=False)
+    ax.set_title(f'Threshold {threshold}')
+plt.suptitle('Matrizes de confusao - Logistic Regression')
+plt.tight_layout()
+plt.savefig(fig_dir / 'confusion_matrix_logreg_thresholds.png')
+ 
 """
 Teste 1 - Logistic Regression                               # y_log_pred = model.predict(X_test)
 Acurácia: 0.800770460822794
