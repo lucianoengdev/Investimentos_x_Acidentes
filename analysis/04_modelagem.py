@@ -7,6 +7,7 @@ from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import classification_report, accuracy_score, ConfusionMatrixDisplay, confusion_matrix, precision_score, recall_score, f1_score
+from sklearn.tree import DecisionTreeClassifier
 
 df = pd.read_csv('../data/processed/acidentes_tratados.csv')
 
@@ -123,6 +124,8 @@ scaler = MinMaxScaler()
 X_train[col_normalizar] = scaler.fit_transform(X_train[col_normalizar])
 X_test[col_normalizar] = scaler.transform(X_test[col_normalizar])
 
+
+"""
 model = LogisticRegression(max_iter = 1000, class_weight='balanced')
 model.fit(X_train, y_train)
 
@@ -168,7 +171,7 @@ plt.suptitle('Matrizes de confusao - Logistic Regression')
 plt.tight_layout()
 plt.savefig(fig_dir / 'confusion_matrix_logreg_thresholds.png')
  
-"""
+
 Teste 1 - Logistic Regression                               # y_log_pred = model.predict(X_test)
 Acurácia: 0.800770460822794
 [[21713  5371]
@@ -353,3 +356,108 @@ Acurácia: 0.961404273877017
    macro avg       0.59      0.69      0.62     27516
 weighted avg       0.98      0.96      0.97     27516
 """
+
+tree_model = DecisionTreeClassifier(random_state=42, class_weight='balanced')
+
+tree_model.fit(X_train, y_train)
+valuesof_tree_model = tree_model.score(X_test, y_test)
+print(valuesof_tree_model)
+
+y_tree_pred = tree_model.predict(X_test)
+
+print(confusion_matrix(y_test, y_tree_pred))
+print(classification_report(y_test, y_tree_pred))
+
+importances = tree_model.feature_importances_
+for name, imp in zip(X.columns, importances):
+   print(name, imp)
+
+feat_importance = pd.DataFrame({'feature': X.columns, 'importance': importances})
+feat_importance = feat_importance.sort_values(by='importance', ascending=False)
+print(feat_importance)
+
+max_depths = [4, 6, 8, 10]
+min_samples_leafs = [20, 50, 100]
+tree_results = []
+
+for max_depth in max_depths:
+    for min_samples_leaf in min_samples_leafs:
+        tree_test = DecisionTreeClassifier(
+            random_state=42,
+            class_weight='balanced',
+            max_depth=max_depth,
+            min_samples_leaf=min_samples_leaf
+        )
+
+        tree_test.fit(X_train, y_train)
+        y_train_pred_tree = tree_test.predict(X_train)
+        y_test_pred_tree = tree_test.predict(X_test)
+
+        tree_results.append({
+            'max_depth': max_depth,
+            'min_samples_leaf': min_samples_leaf,
+            'train_accuracy': accuracy_score(y_train, y_train_pred_tree),
+            'test_accuracy': accuracy_score(y_test, y_test_pred_tree),
+            'train_precision_fatal': precision_score(y_train, y_train_pred_tree, zero_division=0),
+            'test_precision_fatal': precision_score(y_test, y_test_pred_tree, zero_division=0),
+            'train_recall_fatal': recall_score(y_train, y_train_pred_tree, zero_division=0),
+            'test_recall_fatal': recall_score(y_test, y_test_pred_tree, zero_division=0),
+            'train_f1_fatal': f1_score(y_train, y_train_pred_tree, zero_division=0),
+            'test_f1_fatal': f1_score(y_test, y_test_pred_tree, zero_division=0)
+        })
+
+tree_results_df = pd.DataFrame(tree_results)
+print(tree_results_df)
+
+plt.figure(figsize=(12, 6))
+for min_samples_leaf in min_samples_leafs:
+    df_leaf = tree_results_df[tree_results_df['min_samples_leaf'] == min_samples_leaf]
+    plt.plot(
+        df_leaf['max_depth'],
+        df_leaf['train_f1_fatal'],
+        marker='o',
+        linestyle='--',
+        label=f'Treino F1 fatal - leaf {min_samples_leaf}'
+    )
+    plt.plot(
+        df_leaf['max_depth'],
+        df_leaf['test_f1_fatal'],
+        marker='o',
+        linestyle='-',
+        label=f'Teste F1 fatal - leaf {min_samples_leaf}'
+    )
+
+plt.xlabel('max_depth')
+plt.ylabel('F1-score da classe fatal')
+plt.title('Decision Tree - F1 fatal por profundidade e min_samples_leaf')
+plt.grid(True, alpha=0.3)
+plt.legend()
+plt.tight_layout()
+plt.savefig(fig_dir / 'decision_tree_f1_overfitting_curve.png')
+plt.close()
+
+plt.figure(figsize=(12, 6))
+for min_samples_leaf in min_samples_leafs:
+    df_leaf = tree_results_df[tree_results_df['min_samples_leaf'] == min_samples_leaf]
+    plt.plot(
+        df_leaf['max_depth'],
+        df_leaf['test_precision_fatal'],
+        marker='o',
+        label=f'Precision fatal - leaf {min_samples_leaf}'
+    )
+    plt.plot(
+        df_leaf['max_depth'],
+        df_leaf['test_recall_fatal'],
+        marker='x',
+        linestyle='--',
+        label=f'Recall fatal - leaf {min_samples_leaf}'
+    )
+
+plt.xlabel('max_depth')
+plt.ylabel('Score no teste')
+plt.title('Decision Tree - Precision e Recall fatal no teste')
+plt.grid(True, alpha=0.3)
+plt.legend()
+plt.tight_layout()
+plt.savefig(fig_dir / 'decision_tree_precision_recall_curve.png')
+plt.close()
