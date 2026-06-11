@@ -8,6 +8,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import classification_report, accuracy_score, ConfusionMatrixDisplay, confusion_matrix, precision_score, recall_score, f1_score
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
 
 df = pd.read_csv('../data/processed/acidentes_tratados.csv')
 
@@ -359,6 +360,8 @@ weighted avg       0.98      0.96      0.97     27516
 
 tree_model = DecisionTreeClassifier(random_state=42, class_weight='balanced')
 
+"""
+
 tree_model.fit(X_train, y_train)
 valuesof_tree_model = tree_model.score(X_test, y_test)
 print(valuesof_tree_model)
@@ -460,4 +463,175 @@ plt.grid(True, alpha=0.3)
 plt.legend()
 plt.tight_layout()
 plt.savefig(fig_dir / 'decision_tree_precision_recall_curve.png')
+plt.close()
+
+02 - Tree Model tests
+
+0.9750327082424771
+[[26766   318]
+ [  369    63]]
+              precision    recall  f1-score   support
+
+           0       0.99      0.99      0.99     27084
+           1       0.17      0.15      0.15       432
+
+    accuracy                           0.98     27516
+   macro avg       0.58      0.57      0.57     27516
+weighted avg       0.97      0.98      0.97     27516
+
+                                       feature  importance
+11                                 km_ajustado    0.175351
+16                                    hora_cos    0.147809
+15                                    hora_sin    0.102788
+27                     tipo_de_acidente_choque    0.095411
+12                                         ano    0.069140
+13                                         mes    0.066325
+3                                     caminhao    0.047030
+4                                         moto    0.043270
+1                                    automovel    0.036393
+24      tipo_de_acidente_atropelamento_morador    0.033901
+28                    tipo_de_acidente_colisao    0.024618
+22    tipo_de_acidente_atropelamento_andarilho    0.021249
+25       tipo_de_acidente_atropelamento_outros    0.016553
+23  tipo_de_acidente_atropelamento_de_pedestre    0.014671
+6                                       outros    0.011941
+14                                   km_bin_id    0.011844
+10                                 utilitarios    0.010220
+29              tipo_de_acidente_engavetamento    0.009811
+0                                      sentido    0.008867
+5                                       onibus    0.008796
+26                tipo_de_acidente_capotamento    0.008011
+18                                    bin_hora    0.007734
+17                                        hour    0.007265
+31                 tipo_de_acidente_tombamento    0.004924
+2                                    bicicleta    0.004631
+30                     tipo_de_acidente_outros    0.004389
+8               transporte_de_cargas_especiais    0.003868
+19                            trecho_BR-381/MG    0.001487
+20                            trecho_BR-381/SP    0.000978
+7                                tracao_animal    0.000707
+21                            trecho_Contorno/    0.000018
+9                              trator_maquinas    0.000000
+    max_depth  min_samples_leaf  train_accuracy  test_accuracy  train_precision_fatal  test_precision_fatal  train_recall_fatal  test_recall_fatal  train_f1_fatal  test_f1_fatal
+0           4                20        0.629148       0.633014               0.032977              0.032139            0.798149           0.768519        0.063338       0.061699
+1           4                50        0.628648       0.632723               0.032934              0.032386            0.798149           0.775463        0.063258       0.062175
+2           4               100        0.628648       0.632723               0.032934              0.032386            0.798149           0.775463        0.063258       0.062175
+3           6                20        0.673769       0.676843               0.038162              0.036692            0.816657           0.775463        0.072917       0.070069
+4           6                50        0.662212       0.664850               0.037208              0.036001            0.824176           0.789352        0.071202       0.068861
+5           6               100        0.662466       0.665540               0.037139              0.035975            0.821862           0.787037        0.071066       0.068805
+6           8                20        0.765128       0.763846               0.051504              0.046772            0.801041           0.724537        0.096785       0.087872
+7           8                50        0.759386       0.758613               0.050387              0.046583            0.802198           0.738426        0.094818       0.087637
+8           8               100        0.757351       0.757886               0.049688              0.046447            0.796992           0.738426        0.093544       0.087397
+9          10                20        0.834563       0.831444               0.070121              0.060042            0.777328           0.664352        0.128637       0.110130
+10         10                50        0.813574       0.810983               0.063635              0.055379            0.792366           0.687500        0.117809       0.102502
+11         10               100        0.786144       0.784816               0.056964              0.050450            0.810873           0.712963        0.106450       0.094233
+
+
+"""
+
+model_random_forest = RandomForestClassifier(random_state = 42, class_weight = 'balanced')
+model_random_forest.fit(X_train, y_train)
+
+y_random_pred = model_random_forest.predict(X_test)
+
+print("Acurácia:", accuracy_score(y_test, y_random_pred))
+print(confusion_matrix(y_test, y_random_pred))
+print(classification_report(y_test, y_random_pred))
+
+rf_thresholds = [0.05, 0.10, 0.20, 0.30, 0.40, 0.50]
+rf_class_weights = ['balanced', 'balanced_subsample']
+rf_max_depths = [8, 12, None]
+rf_min_samples_leafs = [1, 20, 50]
+rf_results = []
+
+for class_weight in rf_class_weights:
+    for max_depth in rf_max_depths:
+        for min_samples_leaf in rf_min_samples_leafs:
+            rf_test = RandomForestClassifier(
+                random_state=42,
+                class_weight=class_weight,
+                n_estimators=100,
+                max_depth=max_depth,
+                min_samples_leaf=min_samples_leaf,
+                max_features='sqrt',
+                n_jobs=-1
+            )
+
+            rf_test.fit(X_train, y_train)
+            y_rf_proba = rf_test.predict_proba(X_test)[:, 1]
+
+            for threshold in rf_thresholds:
+                y_rf_threshold = (y_rf_proba >= threshold).astype(int)
+                cm = confusion_matrix(y_test, y_rf_threshold)
+
+                rf_results.append({
+                    'class_weight': class_weight,
+                    'max_depth': 'None' if max_depth is None else max_depth,
+                    'min_samples_leaf': min_samples_leaf,
+                    'threshold': threshold,
+                    'accuracy': accuracy_score(y_test, y_rf_threshold),
+                    'precision_fatal': precision_score(y_test, y_rf_threshold, zero_division=0),
+                    'recall_fatal': recall_score(y_test, y_rf_threshold, zero_division=0),
+                    'f1_fatal': f1_score(y_test, y_rf_threshold, zero_division=0),
+                    'false_positives': cm[0, 1],
+                    'false_negatives': cm[1, 0],
+                    'true_positives': cm[1, 1]
+                })
+
+rf_results_df = pd.DataFrame(rf_results)
+rf_results_df = rf_results_df.sort_values(by='f1_fatal', ascending=False)
+print(rf_results_df.head(20))
+
+best_rf = rf_results_df.iloc[0]
+best_rf_label = (
+    f"{best_rf['class_weight']} | depth {best_rf['max_depth']} | "
+    f"leaf {best_rf['min_samples_leaf']}"
+)
+
+best_rf_thresholds = rf_results_df[
+    (rf_results_df['class_weight'] == best_rf['class_weight']) &
+    (rf_results_df['max_depth'] == best_rf['max_depth']) &
+    (rf_results_df['min_samples_leaf'] == best_rf['min_samples_leaf'])
+].sort_values(by='threshold')
+
+plt.figure(figsize=(10, 6))
+plt.plot(best_rf_thresholds['threshold'], best_rf_thresholds['precision_fatal'], marker='o', label='Precision fatal')
+plt.plot(best_rf_thresholds['threshold'], best_rf_thresholds['recall_fatal'], marker='o', label='Recall fatal')
+plt.plot(best_rf_thresholds['threshold'], best_rf_thresholds['f1_fatal'], marker='o', label='F1 fatal')
+plt.xlabel('Threshold')
+plt.ylabel('Score')
+plt.title(f'Random Forest - thresholds\n{best_rf_label}')
+plt.grid(True, alpha=0.3)
+plt.legend()
+plt.tight_layout()
+plt.savefig(fig_dir / 'random_forest_threshold_metrics.png')
+plt.close()
+
+best_by_config = (
+    rf_results_df
+    .sort_values(by='f1_fatal', ascending=False)
+    .drop_duplicates(subset=['class_weight', 'max_depth', 'min_samples_leaf'])
+    .head(10)
+    .copy()
+)
+
+best_by_config['config'] = (
+    best_by_config['class_weight'].astype(str) +
+    '\ndepth=' + best_by_config['max_depth'].astype(str) +
+    '\nleaf=' + best_by_config['min_samples_leaf'].astype(str) +
+    '\nthr=' + best_by_config['threshold'].astype(str)
+)
+
+plt.figure(figsize=(14, 7))
+x_pos = np.arange(len(best_by_config))
+plt.bar(x_pos - 0.25, best_by_config['precision_fatal'], width=0.25, label='Precision fatal')
+plt.bar(x_pos, best_by_config['recall_fatal'], width=0.25, label='Recall fatal')
+plt.bar(x_pos + 0.25, best_by_config['f1_fatal'], width=0.25, label='F1 fatal')
+plt.xticks(x_pos, best_by_config['config'], rotation=45, ha='right')
+plt.ylabel('Score')
+plt.title('Random Forest - melhores configuraÃ§Ãµes por F1 fatal')
+plt.grid(True, axis='y', alpha=0.3)
+plt.legend()
+plt.tight_layout()
+plt.savefig(fig_dir / 'random_forest_config_comparison.png')
 plt.close()
