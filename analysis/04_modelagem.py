@@ -532,7 +532,7 @@ weighted avg       0.97      0.98      0.97     27516
 model_random_forest = RandomForestClassifier(random_state = 42, class_weight = 'balanced')
 model_random_forest.fit(X_train, y_train)
 
-y_random_pred = model_random_forest.predict(X_test)
+"""y_random_pred = model_random_forest.predict(X_test)
 
 print("Acurácia:", accuracy_score(y_test, y_random_pred))
 print(confusion_matrix(y_test, y_random_pred))
@@ -635,3 +635,40 @@ plt.legend()
 plt.tight_layout()
 plt.savefig(fig_dir / 'random_forest_config_comparison.png')
 plt.close()
+
+
+Acurácia: 0.9839366186945777
+[[27057    27]
+ [  415    17]]
+              precision    recall  f1-score   support
+
+           0       0.98      1.00      0.99     27084
+           1       0.39      0.04      0.07       432
+
+    accuracy                           0.98     27516
+   macro avg       0.69      0.52      0.53     27516
+weighted avg       0.98      0.98      0.98     27516
+
+           class_weight max_depth  min_samples_leaf  threshold  accuracy  precision_fatal  recall_fatal  f1_fatal  false_positives  false_negatives  true_positives
+38             balanced      None                 1       0.20  0.981066         0.348123      0.236111  0.281379              191              330             102
+92   balanced_subsample      None                 1       0.20  0.980411         0.318644      0.217593  0.258597              201              338              94
+47             balanced      None                20       0.50  0.961404         0.183735      0.423611  0.256303              813              249             183
+101  balanced_subsample      None                20       0.50  0.960205         0.179090      0.428241  0.252560              848              247             185
+37             balanced      None                 1       0.10  0.966783         0.194937      0.356481  0.252046              636              278             154
+91   balanced_subsample      None                 1       0.10  0.965983         0.184211      0.340278  0.239024              651              285             147
+93   balanced_subsample      None                 1       0.30  0.983282         0.413580      0.155093  0.225589               95              365              67
+39             balanced      None                 1       0.30  0.982846         0.378049      0.143519  0.208054              102              370              62
+36             balanced      None                 1       0.05  0.927678         0.108936      0.502315  0.179043             1775              215             217
+46             balanced      None                20       0.40  0.917975         0.104807      0.560185  0.176578             2067              190             242
+90   balanced_subsample      None                 1       0.05  0.926261         0.105679      0.495370  0.174196             1811              218             214
+100  balanced_subsample      None                20       0.40  0.918520         0.102373      0.539352  0.172083             2043              199             233
+94   balanced_subsample      None                 1       0.40  0.983755         0.425743      0.099537  0.161351               58              389              43
+107  balanced_subsample      None                50       0.50  0.906236         0.092564      0.564815  0.159061             2392              188             244
+53             balanced      None                50       0.50  0.904129         0.089352      0.555556  0.153945             2446              192             240
+40             balanced      None                 1       0.40  0.983464         0.383838      0.087963  0.143126               61              394              38
+77   balanced_subsample        12                 1       0.50  0.909362         0.081914      0.467593  0.139406             2264              230             202
+23             balanced        12                 1       0.50  0.906563         0.081081      0.479167  0.138693             2346              225             207
+29             balanced        12                20       0.50  0.880869         0.077243      0.601852  0.136914             3106              172             260
+83   balanced_subsample        12                20       0.50  0.880760         0.076672      0.597222  0.135897             3107              174             258
+(venv) 
+"""
