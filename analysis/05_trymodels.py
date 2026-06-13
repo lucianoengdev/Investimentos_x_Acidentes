@@ -56,7 +56,7 @@ df.loc[~df['tipo_de_acidente'].isin(manter), 'tipo_de_acidente'] = 'outros'
 encoded = encoder.fit_transform(df[['tipo_de_acidente']])
 df_encoded = pd.DataFrame(encoded, columns=encoder.get_feature_names_out(['tipo_de_acidente']))
 df = pd.concat([df, df_encoded], axis=1)
-df = df.drop(columns = ['trecho', 'tipo_de_acidente'])
+df = df.drop(columns = ['trecho', 'tipo_de_acidente', 'hour', 'bin_hora'])
 
 X = df.drop(columns = 'acidente_fatal')
 y = df['acidente_fatal']
@@ -149,6 +149,7 @@ print('\n' + '=' * 80)
 print('Resumo dos modelos')
 print(results_df)
 
+print(df.columns)
 
 """
 Teste 1 - Retirando 'trecho'
