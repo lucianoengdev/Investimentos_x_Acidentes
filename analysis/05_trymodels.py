@@ -47,10 +47,10 @@ df['tipo_de_acidente'] = (
 )
 # df.loc[df['tipo_de_acidente'].str.contains('atropelamento'), 'tipo_de_acidente'] = 'atropelamento'
 df.loc[df['tipo_de_acidente'].str.contains('choque'), 'tipo_de_acidente'] = 'choque'
-df.loc[df['tipo_de_acidente'].str.contains('colisao'), 'tipo_de_acidente'] = 'colisao'
+df.loc[df['tipo_de_acidente'].str.contains('colisao_lateral'), 'tipo_de_acidente'] = 'colisao_lateral'
 manter_atropelamento = ['atropelamento_de_pedestre', 'atropelamento_morador', 'atropelamento_andarilho']
 df.loc[df['tipo_de_acidente'].str.contains('atropelamento') & ~df['tipo_de_acidente'].isin(manter_atropelamento), 'tipo_de_acidente'] = 'atropelamento_outros'
-manter = ['atropelamento_de_pedestre', 'atropelamento_morador', 'atropelamento_andarilho', 'atropelamento_outros', 'choque', 'colisao', 'tombamento', 'engavetamento', 'capotamento']
+manter = ['atropelamento_de_pedestre', 'atropelamento_morador', 'atropelamento_andarilho', 'atropelamento_outros', 'choque', 'colisao', 'tombamento', 'engavetamento', 'capotamento', 'colisao_lateral', 'colisao_frontal', 'colisao_traseira', 'colisao_transversal']
 df.loc[~df['tipo_de_acidente'].isin(manter), 'tipo_de_acidente'] = 'outros'
 
 encoded = encoder.fit_transform(df[['tipo_de_acidente']])
