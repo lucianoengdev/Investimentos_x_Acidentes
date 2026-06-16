@@ -58,6 +58,7 @@ df_encoded = pd.DataFrame(encoded, columns=encoder.get_feature_names_out(['tipo_
 df = pd.concat([df, df_encoded], axis=1)
 df = df.drop(columns = ['trecho', 'tipo_de_acidente', 'hour', 'bin_hora'])
 
+
 X = df.drop(columns = 'acidente_fatal')
 y = df['acidente_fatal']
 
@@ -154,55 +155,32 @@ print(df.columns)
 """
 Teste 1 - Retirando 'trecho'
 ================================================================================
-logistic_regression
-Threshold: 0.8
-[[26334   750]
- [  261   171]]
-              precision    recall  f1-score   support
-
-           0       0.99      0.97      0.98     27084
-           1       0.19      0.40      0.25       432
-
-    accuracy                           0.96     27516
-   macro avg       0.59      0.68      0.62     27516
-weighted avg       0.98      0.96      0.97     27516
-
-
-================================================================================
-decision_tree
-Threshold: 0.5
-[[26779   305]
- [  375    57]]
-              precision    recall  f1-score   support
-
-           0       0.99      0.99      0.99     27084
-           1       0.16      0.13      0.14       432
-
-    accuracy                           0.98     27516
-   macro avg       0.57      0.56      0.57     27516
-weighted avg       0.97      0.98      0.97     27516
-
-
-================================================================================
-random_forest
-Threshold: 0.2
-[[26894   190]
- [  329   103]]
-              precision    recall  f1-score   support
-
-           0       0.99      0.99      0.99     27084
-           1       0.35      0.24      0.28       432
-
-    accuracy                           0.98     27516
-   macro avg       0.67      0.62      0.64     27516
-weighted avg       0.98      0.98      0.98     27516
-
-
-================================================================================
 Resumo dos modelos
                  model  threshold  accuracy  precision_fatal  recall_fatal  f1_fatal     tn   fp   fn   tp
 2        random_forest        0.2  0.981138         0.351536      0.238426  0.284138  26894  190  329  103
 0  logistic_regression        0.8  0.963258         0.185668      0.395833  0.252772  26334  750  261  171
 1        decision_tree        0.5  0.975287         0.157459      0.131944  0.143577  26779  305  375   57
-(venv) 
+
+================================================================================
+Teste 2 - Separando 'colisao'
+
+Resumo dos modelos
+                 model  threshold  accuracy  precision_fatal  recall_fatal  f1_fatal     tn    fp   fn   tp
+2        random_forest        0.2  0.980920         0.346535      0.243056  0.285714  26886   198  327  105
+0  logistic_regression        0.7  0.931931         0.121387      0.534722  0.197859  25412  1672  201  231
+1        decision_tree        0.5  0.975214         0.160326      0.136574  0.147500  26775   309  373   59
+
+================================================================================
+Teste 3 - Separando periodos do dia
+df['periodo'] = pd.cut(df['hour'], bins=[0, 6, 12, 18, 25], labels=['madrugada', 'manha', 'tarde', 'noite'], right=False, include_lowest=True)
+encoded = encoder.fit_transform(df[['periodo']])
+df_encoded = pd.DataFrame(encoded, columns=encoder.get_feature_names_out(['periodo']))
+df = pd.concat([df, df_encoded], axis=1)
+df = df.drop(columns = ['trecho', 'tipo_de_acidente', 'hour', 'bin_hora', 'periodo'])
+ -> Performou pior, não vou utilizar.
+ Resumo dos modelos
+                 model  threshold  accuracy  precision_fatal  recall_fatal  f1_fatal     tn   fp   fn   tp
+2        random_forest        0.2  0.980775         0.338870      0.236111  0.278308  26885  199  330  102
+0  logistic_regression        0.8  0.961041         0.184418      0.432870  0.258645  26257  827  245  187
+1        decision_tree        0.5  0.975941         0.173295      0.141204  0.155612  26793  291  371   61
 """
