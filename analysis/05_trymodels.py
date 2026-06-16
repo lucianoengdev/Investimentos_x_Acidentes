@@ -56,7 +56,7 @@ df.loc[~df['tipo_de_acidente'].isin(manter), 'tipo_de_acidente'] = 'outros'
 encoded = encoder.fit_transform(df[['tipo_de_acidente']])
 df_encoded = pd.DataFrame(encoded, columns=encoder.get_feature_names_out(['tipo_de_acidente']))
 df = pd.concat([df, df_encoded], axis=1)
-df = df.drop(columns = ['trecho', 'tipo_de_acidente', 'hour', 'bin_hora'])
+df = df.drop(columns = ['trecho', 'tipo_de_acidente', 'hour', 'bin_hora', 'km_bin_id'])
 
 
 X = df.drop(columns = 'acidente_fatal')
@@ -183,4 +183,11 @@ df = df.drop(columns = ['trecho', 'tipo_de_acidente', 'hour', 'bin_hora', 'perio
 2        random_forest        0.2  0.980775         0.338870      0.236111  0.278308  26885  199  330  102
 0  logistic_regression        0.8  0.961041         0.184418      0.432870  0.258645  26257  827  245  187
 1        decision_tree        0.5  0.975941         0.173295      0.141204  0.155612  26793  291  371   61
+
+Test 4 - Teentei manter somente o 'km_ajustado' ou somente o 'km_bin_id', e o primeiro ('km_ajustado') performou muito melhor entre eles, então vou manter, com o seguinte resultado abaixo:
+Resumo dos modelos
+                 model  threshold  accuracy  precision_fatal  recall_fatal  f1_fatal     tn   fp   fn   tp
+2        random_forest        0.2  0.980811         0.352761      0.266204  0.303430  26873  211  317  115
+0  logistic_regression        0.8  0.961622         0.186747      0.430556  0.260504  26274  810  246  186
+1        decision_tree        0.5  0.975432         0.159218      0.131944  0.144304  26783  301  375   57
 """
