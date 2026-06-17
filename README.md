@@ -7,7 +7,7 @@
 ![Seaborn](https://img.shields.io/badge/Seaborn-4C72B0?style=for-the-badge)
 ![scikit--learn](https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white)
 
-**Current version:** `v0.4.0-alpha`
+**Current version:** `v0.5.0-alpha`
 
 ## What This Does
 
@@ -21,7 +21,7 @@ Working features:
 - Adjusts historical investment values using annual IPCA inflation.
 - Compares investment and fatal-crash patterns across concession phases.
 - Documents hotspot, vehicle, crash-type and investment findings for a technical article.
-- Keeps fatal-crash machine learning as a future complementary extension.
+- Develops an occurrence-level machine learning extension in parallel with the article work.
 
 ## What Is This?
 
@@ -34,7 +34,7 @@ The code is expected to produce:
 - documented analysis scripts in `analysis/`;
 - reusable data-processing and visualization functions in `src/`;
 - a technical article about fatal crashes, investment and roadway safety;
-- a future optional machine learning extension at occurrence level.
+- an optional machine learning extension at occurrence level.
 
 The main analytical metric is:
 
@@ -55,7 +55,7 @@ acidente_fatal = mortos > 0
 - **NumPy**: numerical operations.
 - **Matplotlib**: static chart generation.
 - **Seaborn**: exploratory statistical visualizations.
-- **scikit-learn**: planned future complementary machine learning extension.
+- **scikit-learn**: occurrence-level fatal-crash classification experiments.
 - **Git / GitHub Desktop**: version control workflow.
 - **VS Code**: development environment.
 
@@ -69,9 +69,13 @@ The goal is to build a complete transportation data project. The project is not 
 4. interpret the results before modeling;
 5. compare crash patterns with roadway investment;
 6. write a public technical article with conclusions and limitations;
-7. optionally extend the repository with occurrence-level fatal-crash classification.
+7. extend the repository with occurrence-level fatal-crash classification as complementary work.
 
-The primary goal is to produce a transparent exploratory analysis of how fatal crashes, dangerous locations, crash types and historical investment patterns relate on the BR-381 / Fernao Dias corridor, while being careful not to claim causality without enough evidence. Machine learning is a later complementary path rather than part of the article's core scope.
+The primary goal is to produce a transparent exploratory analysis of how fatal crashes, dangerous locations, crash types and historical investment patterns relate on the BR-381 / Fernao Dias corridor, while being careful not to claim causality without enough evidence.
+
+The technical article is being written from the exploratory analysis and methodology already documented in this repository. The article follows the reasoning developed through the data preparation, hotspot analysis and investment comparison phases. Once finished, the final article will be added to the repository.
+
+Machine learning is being developed in parallel as a complementary repository extension. It is intentionally outside the article's core scope, because the article focuses on exploratory evidence about investment, fatal crashes, dangerous locations and crash patterns.
 
 ## Project Stage
 
@@ -92,15 +96,17 @@ This project is a **work in progress**.
 - [x] Step 4: Prepare and adjust investment data using IPCA inflation.
 - [x] Compare corrected investment with fatal crashes using overall and phase-based exploratory views.
 - [x] Document the conclusion and the limits of estimating investment effects.
+- [x] Create a baseline modeling report for occurrence-level fatal-crash classification.
 
 ### In Progress
 
 - [ ] Write the technical article from the exploratory analysis and documented findings.
+- [ ] Improve the occurrence-level machine learning feature set and compare model behavior.
 
 ### Future Extension
 
-- [ ] Define an occurrence-level fatal-crash classification question.
-- [ ] Train and evaluate machine learning models as a complementary repository extension.
+- [ ] Refine model validation and interpretation after feature-engineering experiments.
+- [ ] Decide whether the machine learning extension should remain exploratory or become a polished repository module.
 
 ## Kilometer Correction
 
@@ -154,7 +160,27 @@ The article produced from this repository focuses on the exploratory findings de
 
 The available investment series is annual and too limited to estimate reliably how much money would be required to reduce a specified number of fatal crashes. Therefore, the article treats investment findings as exploratory associations and methodological evidence, not as a causal prediction model.
 
-After the article analysis, the repository may be extended with machine learning at occurrence level. That complementary work will investigate whether a crash is fatal from features such as crash type, vehicle involvement, corrected kilometer range and temporal or road characteristics. It is intentionally outside the core investment-versus-crashes article scope.
+The repository is also being extended with machine learning at occurrence level. This complementary work investigates whether a crash is fatal from features such as crash type, vehicle involvement, corrected kilometer position and temporal characteristics. It is intentionally outside the core investment-versus-crashes article scope, but remains useful as a data science extension of the project.
+
+## Machine Learning Extension
+
+The machine learning work asks a different question from the investment analysis:
+
+```text
+Given a crash occurrence, can we estimate whether it is likely to be fatal?
+```
+
+This extension uses `acidente_fatal` as the target variable and treats fatal crashes as the minority class. Because fatal crashes are rare compared with total crashes, model evaluation prioritizes fatal-class precision, recall and F1-score rather than overall accuracy alone.
+
+The current modeling workflow includes:
+
+- a baseline modeling script in `analysis/04_modelagem.py`;
+- an experimental feature-testing script in `analysis/05_trymodels.py`;
+- model comparison using Logistic Regression, Decision Tree and Random Forest;
+- threshold-based classification using `predict_proba`;
+- feature experiments such as removing redundant spatial variables, separating collision types, simplifying time variables and comparing corrected kilometer representations.
+
+The baseline findings and next modeling decisions are documented in `reports/04_modeling_baseline_and_next_steps.md`.
 
 ## Repository Structure
 
@@ -168,7 +194,8 @@ After the article analysis, the repository may be extended with machine learning
 |   |-- 01_analise_inicial.py
 |   |-- 02_hotspots_km_veiculos.py
 |   |-- 03_investimentos.py
-|   `-- 04_modelagem.py
+|   |-- 04_modelagem.py
+|   `-- 05_trymodels.py
 |-- reports/
 |   |-- figures/
 |   |   |-- 01_analise_inicial/
@@ -178,6 +205,7 @@ After the article analysis, the repository may be extended with machine learning
 |   |--01_initial_report.md
 |   |--02_investment_methodology_note.md
 |   |--03_conclusion_after_phase4.md
+|   |--04_modeling_baseline_and_next_steps.md
 |   `-- artigo/
 |-- src/
 |   |-- data_processing.py
@@ -196,7 +224,7 @@ After the article analysis, the repository may be extended with machine learning
 - A simple one-year lag may not capture persistent effects from infrastructure investment.
 - The crash dataset has a kilometer discontinuity that required a corrected spatial reference.
 - The year 2026 may be partial and should not be compared directly with complete years without adjustment.
-- Fatal crashes are relatively rare compared with total crashes; any future machine learning extension must handle class imbalance carefully.
+- Fatal crashes are relatively rare compared with total crashes; the machine learning extension must handle class imbalance carefully.
 - Investment and fatal crash reduction must not be interpreted as causal without additional statistical evidence and domain validation.
 - Traffic exposure data, such as AADT or vehicle-kilometers traveled, is not currently included.
 - Investment values must be adjusted for inflation before historical comparison; nominal values alone can be misleading.
@@ -209,12 +237,12 @@ This repository uses semantic versioning while the project evolves:
 - `v0.2.0-alpha`: initial charts completed and kilometer correction added.
 - `v0.3.0-alpha`: hotspot analysis using corrected kilometer reference.
 - `v0.4.0-alpha`: investment comparison, phase analysis and article preparation.
-- `v0.5.0-alpha`: planned article completion and public analysis refinement.
+- `v0.5.0-alpha`: article writing plus occurrence-level machine learning baseline and feature experiments.
 - `v1.0.0`: planned first complete public exploratory analysis and article.
-- Future extension: occurrence-level machine learning baseline.
+- Future extension: refined machine learning validation and interpretation.
 
 ## Next Step
 
-The next development step is to consolidate the exploratory findings, figures, methodology and limitations into the technical article. Occurrence-level machine learning remains a future complementary extension of the repository.
+The next development step is to consolidate the exploratory findings, figures, methodology and limitations into the technical article while continuing the occurrence-level machine learning extension as a complementary analysis.
 
 *Developed by a Data Scientist / Analyst and Transport Engineer - Luciano Faria.*
