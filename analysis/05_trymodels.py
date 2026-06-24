@@ -56,7 +56,8 @@ df.loc[~df['tipo_de_acidente'].isin(manter), 'tipo_de_acidente'] = 'outros'
 encoded = encoder.fit_transform(df[['tipo_de_acidente']])
 df_encoded = pd.DataFrame(encoded, columns=encoder.get_feature_names_out(['tipo_de_acidente']))
 df = pd.concat([df, df_encoded], axis=1)
-
+# df['veiculos_pesados'] = ((df['caminhao'] > 0) | (df['tracao_animal'] > 0) | (df['transporte_de_cargas_especiais'] > 0) | (df['trator_maquinas'] > 0 )).astype(int)  -- Tentativa de agrupar veículos pesados
+# df = df.drop(columns = ['trator_maquinas', 'caminhao', 'tracao_animal', 'transporte_de_cargas_especiais'])
 df = df.drop(columns = ['trecho', 'tipo_de_acidente', 'hour', 'bin_hora', 'km_bin_id'])
 
 
@@ -207,5 +208,13 @@ Resumo dos modelos - mes
 2        random_forest        0.2  0.980629         0.342679      0.254630  0.292165  26873  211  322  110
 0  logistic_regression        0.8  0.961295         0.183183      0.423611  0.255765  26268  816  249  183
 1        decision_tree        0.5  0.973761         0.131980      0.120370  0.125908  26742  342  380   52
- 
+
+================================================================================
+Teste 6 - Agrupar veículos pesados não melhorou o modelo. 
+Resumo dos modelos
+                 model  threshold  accuracy  precision_fatal  recall_fatal  f1_fatal     tn   fp   fn   tp
+2        random_forest        0.2  0.980957         0.350649      0.250000  0.291892  26884  200  324  108
+0  logistic_regression        0.8  0.963876         0.194565      0.414352  0.264793  26343  741  253  179
+1        decision_tree        0.5  0.974996         0.152174      0.129630  0.140000  26772  312  376   56
+
 """
