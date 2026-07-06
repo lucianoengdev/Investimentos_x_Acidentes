@@ -58,6 +58,8 @@ df_encoded = pd.DataFrame(encoded, columns=encoder.get_feature_names_out(['tipo_
 df = pd.concat([df, df_encoded], axis=1)
 # df['veiculos_pesados'] = ((df['caminhao'] > 0) | (df['tracao_animal'] > 0) | (df['transporte_de_cargas_especiais'] > 0) | (df['trator_maquinas'] > 0 )).astype(int)  -- Tentativa de agrupar veículos pesados
 # df = df.drop(columns = ['trator_maquinas', 'caminhao', 'tracao_animal', 'transporte_de_cargas_especiais'])
+# df['vulneravel'] = ((df['moto'] > 0) | (df['bicicleta'] > 0)).astype(int) -- Tentativa de agrupar veículos leves
+# df = df.drop(columns = ['moto', 'bicicleta'])
 df = df.drop(columns = ['trecho', 'tipo_de_acidente', 'hour', 'bin_hora', 'km_bin_id'])
 
 
@@ -210,11 +212,15 @@ Resumo dos modelos - mes
 1        decision_tree        0.5  0.973761         0.131980      0.120370  0.125908  26742  342  380   52
 
 ================================================================================
-Teste 6 - Agrupar veículos pesados não melhorou o modelo. 
-Resumo dos modelos
+Teste 6 - Agrupar veículos  
+Resumo dos modelos - Agrupar veículos pesados não melhorou o modelo.
                  model  threshold  accuracy  precision_fatal  recall_fatal  f1_fatal     tn   fp   fn   tp
 2        random_forest        0.2  0.980957         0.350649      0.250000  0.291892  26884  200  324  108
 0  logistic_regression        0.8  0.963876         0.194565      0.414352  0.264793  26343  741  253  179
 1        decision_tree        0.5  0.974996         0.152174      0.129630  0.140000  26772  312  376   56
-
+Resumo dos modelos - Agrupar veículos leves (moto, bicicleta)
+                 model  threshold  accuracy  precision_fatal  recall_fatal  f1_fatal     tn   fp   fn   tp
+2        random_forest        0.2  0.981066         0.357827      0.259259  0.300671  26883  201  320  112
+0  logistic_regression        0.8  0.961477         0.186000      0.430556  0.259777  26270  814  246  186
+1        decision_tree        0.5  0.975396         0.162534      0.136574  0.148428  26780  304  373   59
 """
