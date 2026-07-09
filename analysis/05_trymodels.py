@@ -63,6 +63,21 @@ df = pd.concat([df, df_encoded], axis=1)
 df = df.drop(columns = ['trecho', 'tipo_de_acidente', 'hour', 'bin_hora', 'km_bin_id'])
 
 
+# Testar interações
+# caminhao + atropelamento
+#cols_atropelamento = ['tipo_de_acidente_atropelamento_andarilho', 'tipo_de_acidente_atropelamento_de_pedestre', 'tipo_de_acidente_atropelamento_morador', 'tipo_de_acidente_atropelamento_outros']
+#df['tipo_atropelamento'] = df[cols_atropelamento].max(axis=1)
+#df['inter_caminhao_atropelamento'] = df['caminhao'] * df['tipo_atropelamento']
+
+# moto + colisao frontal
+#df['moto_frontal'] = df['moto'] * df['tipo_de_acidente_colisao_frontal']
+
+# moto + colisao traseira
+#df['moto_traseira'] = df['moto'] * df['tipo_de_acidente_colisao_traseira']
+
+# automovel + colisao traseira
+# df['automovel_traseira'] = df['moto'] * df['tipo_de_acidente_colisao_traseira']
+
 X = df.drop(columns = 'acidente_fatal')
 y = df['acidente_fatal']
 
@@ -223,4 +238,14 @@ Resumo dos modelos - Agrupar veículos leves (moto, bicicleta)
 2        random_forest        0.2  0.981066         0.357827      0.259259  0.300671  26883  201  320  112
 0  logistic_regression        0.8  0.961477         0.186000      0.430556  0.259777  26270  814  246  186
 1        decision_tree        0.5  0.975396         0.162534      0.136574  0.148428  26780  304  373   59
+
+================================================================================
+Teste de interações entre veículo e tipo de acidente:
+Foram testadas combinações como caminhão + atropelamento, moto + colisão frontal, moto + colisão traseira e automóvel + colisão traseira. As interações não melhoraram o desempenho de forma consistente. A única pequena melhora ocorreu na Logistic Regression, mas foi equivalente a apenas um falso positivo a menos, enquanto a Random Forest perdeu precisão e f1_score. Portanto, as interações foram descartadas e o conjunto anterior de features foi mantido. Segue o melhor resultado entre as interações feitas.
+    Deixei caminhão + atropelamento e moto + colisão frontal
+Resumo dos modelos
+                 model  threshold  accuracy  precision_fatal  recall_fatal  f1_fatal     tn   fp   fn   tp
+2        random_forest        0.2  0.980084         0.332370      0.266204  0.295630  26853  231  317  115
+0  logistic_regression        0.8  0.961659         0.186935      0.430556  0.260687  26275  809  246  186
+1        decision_tree        0.5  0.974633         0.146277      0.127315  0.136139  26763  321  377   55
 """
