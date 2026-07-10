@@ -108,13 +108,12 @@ models = {
         'model': RandomForestClassifier(
             random_state=42,
             class_weight='balanced',
-            n_estimators=100,
-            max_depth=None,
-            min_samples_leaf=1,
+            n_estimators=300,
+            min_samples_leaf=2,
             max_features='sqrt',
             n_jobs=-1
         ),
-        'threshold': 0.2,
+        'threshold': 0.35,
         'requires_scaling': False,
     }
 }
@@ -167,7 +166,8 @@ results_df = results_df.sort_values(by='f1_fatal', ascending=False)
 
 print('\n' + '=' * 80)
 print('Resumo dos modelos')
-print(results_df)
+# print(results_df)
+print(results_df.to_string(index=False))
 
 print(df.columns)
 
@@ -248,4 +248,12 @@ Resumo dos modelos
 2        random_forest        0.2  0.980084         0.332370      0.266204  0.295630  26853  231  317  115
 0  logistic_regression        0.8  0.961659         0.186935      0.430556  0.260687  26275  809  246  186
 1        decision_tree        0.5  0.974633         0.146277      0.127315  0.136139  26763  321  377   55
+
+================================================================================
+Alterei o n_estimators=300; min_samples_leaf=2; threshold=0.35
+Resumo dos modelos
+              model  threshold  accuracy  precision_fatal  recall_fatal  f1_fatal    tn  fp  fn  tp
+      random_forest       0.35  0.980048         0.349614      0.314815  0.331303 26831 253 296 136
+logistic_regression       0.80  0.961622         0.186747      0.430556  0.260504 26274 810 246 186
+      decision_tree       0.50  0.975432         0.159218      0.131944  0.144304 26783 301 375  57
 """
