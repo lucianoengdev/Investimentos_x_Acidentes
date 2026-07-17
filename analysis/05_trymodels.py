@@ -9,6 +9,7 @@ from sklearn.dummy import DummyClassifier
 from sklearn.metrics import classification_report, accuracy_score, ConfusionMatrixDisplay, confusion_matrix, precision_score, recall_score, f1_score
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.utils import resample
 
 df = pd.read_csv('../data/processed/acidentes_tratados.csv')
 
@@ -116,6 +117,21 @@ models = {
         'threshold': 0.35,
         'requires_scaling': False,
     }
+    ,
+
+    'random_forest_undersample_15x': {
+        'model': RandomForestClassifier(
+            random_state=42,
+            n_estimators=300,
+            min_samples_leaf=2,
+            max_features='sqrt',
+            n_jobs=-1
+        ),
+        'threshold': 0.35,
+        'requires_scaling': False,
+        'sampling': 'undersample_majority',
+        'majority_ratio': 15,
+    }
 }
 
 results = []
@@ -124,15 +140,36 @@ for model_name, config in models.items():
     model = config['model']
     threshold = config['threshold']
 
+    X_train_config = X_train
+    y_train_config = y_train
+
+    if config.get('sampling') == 'undersample_majority':
+        train_config = pd.concat([X_train, y_train], axis=1)
+        df_majority = train_config[train_config['acidente_fatal'] == 0]
+        df_minority = train_config[train_config['acidente_fatal'] == 1]
+
+        df_majority_downsampled = resample(
+            df_majority,
+            replace=False,
+            n_samples=min(len(df_majority), len(df_minority) * config['majority_ratio']),
+            random_state=42
+        )
+
+        train_config = pd.concat([df_majority_downsampled, df_minority])
+        train_config = train_config.sample(frac=1, random_state=42)
+
+        X_train_config = train_config.drop(columns='acidente_fatal')
+        y_train_config = train_config['acidente_fatal']
+
     if config['requires_scaling']:
         scaler = MinMaxScaler()
-        X_train_model = scaler.fit_transform(X_train)
+        X_train_model = scaler.fit_transform(X_train_config)
         X_test_model = scaler.transform(X_test)
     else:
-        X_train_model = X_train
+        X_train_model = X_train_config
         X_test_model = X_test
 
-    model.fit(X_train_model, y_train)
+    model.fit(X_train_model, y_train_config)
 
     if hasattr(model, 'predict_proba'):
         y_proba = model.predict_proba(X_test_model)[:, 1]
@@ -256,4 +293,13 @@ Resumo dos modelos
       random_forest       0.35  0.980048         0.349614      0.314815  0.331303 26831 253 296 136
 logistic_regression       0.80  0.961622         0.186747      0.430556  0.260504 26274 810 246 186
       decision_tree       0.50  0.975432         0.159218      0.131944  0.144304 26783 301 375  57
+
+================================================================================
+Testando um random fores balanceado manualmente, uma pequena, mas uma melhoria no melhor modelo que existia até agora
+Resumo dos modelos
+                        model  threshold  accuracy  precision_fatal  recall_fatal  f1_fatal    tn  fp  fn  tp
+random_forest_undersample_15x       0.35  0.978195         0.322785      0.354167  0.337748 26763 321 279 153
+                random_forest       0.35  0.980048         0.349614      0.314815  0.331303 26831 253 296 136
+          logistic_regression       0.80  0.961622         0.186747      0.430556  0.260504 26274 810 246 186
+                decision_tree       0.50  0.975432         0.159218      0.131944  0.144304 26783 301 375  57
 """
