@@ -7,7 +7,7 @@
 ![Seaborn](https://img.shields.io/badge/Seaborn-4C72B0?style=for-the-badge)
 ![scikit--learn](https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white)
 
-**Current version:** `v0.5.0-alpha`
+**Current version:** `v0.6.0-alpha`
 
 ## What This Does
 
@@ -20,8 +20,9 @@ Working features:
 - Generates initial exploratory charts for fatal crashes, deaths, crash types and kilometer distribution.
 - Adjusts historical investment values using annual IPCA inflation.
 - Compares investment and fatal-crash patterns across concession phases.
-- Documents hotspot, vehicle, crash-type and investment findings for a technical article.
-- Develops an occurrence-level machine learning extension in parallel with the article work.
+- Documents hotspot, vehicle, crash-type and investment findings used in the final article.
+- Extends the original plan with occurrence-level machine learning experiments for fatal-crash classification.
+- Includes an article accepted for presentation and publication at ANPET 2026.
 
 ## What Is This?
 
@@ -33,8 +34,8 @@ The code is expected to produce:
 - exploratory charts in `reports/figures/`;
 - documented analysis scripts in `analysis/`;
 - reusable data-processing and visualization functions in `src/`;
-- a technical article about fatal crashes, investment and roadway safety;
-- an optional machine learning extension at occurrence level.
+- a completed technical article about fatal crashes, investment and roadway safety;
+- an additional machine learning extension at occurrence level.
 
 The main analytical metric is:
 
@@ -69,13 +70,13 @@ The goal is to build a complete transportation data project. The project is not 
 4. interpret the results before modeling;
 5. compare crash patterns with roadway investment;
 6. write a public technical article with conclusions and limitations;
-7. extend the repository with occurrence-level fatal-crash classification as complementary work.
+7. extend the repository with occurrence-level fatal-crash classification as complementary work beyond the original article scope.
 
 The primary goal is to produce a transparent exploratory analysis of how fatal crashes, dangerous locations, crash types and historical investment patterns relate on the BR-381 / Fernao Dias corridor, while being careful not to claim causality without enough evidence.
 
-The technical article is being written from the exploratory analysis and methodology already documented in this repository. The article follows the reasoning developed through the data preparation, hotspot analysis and investment comparison phases. Once finished, the final article will be added to the repository.
+The technical article was written from the exploratory analysis and methodology documented in this repository. It follows the reasoning developed through the data preparation, hotspot analysis and investment comparison phases. The article was accepted for presentation and publication at ANPET 2026.
 
-Machine learning is being developed in parallel as a complementary repository extension. It is intentionally outside the article's core scope, because the article focuses on exploratory evidence about investment, fatal crashes, dangerous locations and crash patterns.
+Machine learning is now being developed as an additional repository extension beyond the original article plan. It is intentionally outside the article's core scope, because the article focuses on exploratory evidence about investment, fatal crashes, dangerous locations and crash patterns.
 
 ## Project Stage
 
@@ -97,15 +98,17 @@ This project is a **work in progress**.
 - [x] Compare corrected investment with fatal crashes using overall and phase-based exploratory views.
 - [x] Document the conclusion and the limits of estimating investment effects.
 - [x] Create a baseline modeling report for occurrence-level fatal-crash classification.
+- [x] Complete the technical article based on the exploratory analysis.
+- [x] Article accepted for presentation and publication at ANPET 2026.
 
 ### In Progress
 
-- [ ] Write the technical article from the exploratory analysis and documented findings.
-- [ ] Improve the occurrence-level machine learning feature set and compare model behavior.
+- [ ] Improve the occurrence-level machine learning model beyond the original article plan.
+- [ ] Deepen the Random Forest modeling path with threshold tuning, class-imbalance strategies and model interpretation.
 
 ### Future Extension
 
-- [ ] Refine model validation and interpretation after feature-engineering experiments.
+- [ ] Refine model validation and interpretation after Random Forest experiments.
 - [ ] Decide whether the machine learning extension should remain exploratory or become a polished repository module.
 
 ## Kilometer Correction
@@ -149,7 +152,7 @@ This methodological note is documented in `reports/02_investment_methodology_not
 
 ## Article Scope And Modeling Extension
 
-The article produced from this repository focuses on the exploratory findings developed so far:
+The article produced from this repository focuses on the exploratory findings developed during the main analytical phase:
 
 - changes in fatal-crash levels over time;
 - dangerous kilometer zones using a corrected linear road reference;
@@ -160,7 +163,9 @@ The article produced from this repository focuses on the exploratory findings de
 
 The available investment series is annual and too limited to estimate reliably how much money would be required to reduce a specified number of fatal crashes. Therefore, the article treats investment findings as exploratory associations and methodological evidence, not as a causal prediction model.
 
-The repository is also being extended with machine learning at occurrence level. This complementary work investigates whether a crash is fatal from features such as crash type, vehicle involvement, corrected kilometer position and temporal characteristics. It is intentionally outside the core investment-versus-crashes article scope, but remains useful as a data science extension of the project.
+This article stage is complete. The work was accepted for presentation and publication at ANPET 2026.
+
+The repository is now being extended with machine learning at occurrence level as additional work beyond the article. This complementary work investigates whether a crash is fatal from features such as crash type, vehicle involvement, corrected kilometer position and temporal characteristics. It is intentionally outside the core investment-versus-crashes article scope, but remains useful as a data science extension of the project.
 
 ## Machine Learning Extension
 
@@ -176,11 +181,13 @@ The current modeling workflow includes:
 
 - a baseline modeling script in `analysis/04_modelagem.py`;
 - an experimental feature-testing script in `analysis/05_trymodels.py`;
+- a Random Forest-focused improvement script in `analysis/05a_random_forest.py`;
 - model comparison using Logistic Regression, Decision Tree and Random Forest;
 - threshold-based classification using `predict_proba`;
 - feature experiments such as removing redundant spatial variables, separating collision types, simplifying time variables and comparing corrected kilometer representations.
+- class-imbalance experiments using undersampling for the fatal-crash minority class.
 
-The baseline findings and next modeling decisions are documented in `reports/04_modeling_baseline_and_next_steps.md`.
+The baseline findings and next modeling decisions are documented in `reports/04_modeling_baseline_and_next_steps.md` and `reports/04a_model_improvement_strategy.md`.
 
 ## Repository Structure
 
@@ -195,7 +202,8 @@ The baseline findings and next modeling decisions are documented in `reports/04_
 |   |-- 02_hotspots_km_veiculos.py
 |   |-- 03_investimentos.py
 |   |-- 04_modelagem.py
-|   `-- 05_trymodels.py
+|   |-- 05_trymodels.py
+|   `-- 05a_random_forest.py
 |-- reports/
 |   |-- figures/
 |   |   |-- 01_analise_inicial/
@@ -206,6 +214,7 @@ The baseline findings and next modeling decisions are documented in `reports/04_
 |   |--02_investment_methodology_note.md
 |   |--03_conclusion_after_phase4.md
 |   |--04_modeling_baseline_and_next_steps.md
+|   |--04a_model_improvement_strategy.md
 |   `-- artigo/
 |-- src/
 |   |-- data_processing.py
@@ -219,7 +228,7 @@ The baseline findings and next modeling decisions are documented in `reports/04_
 
 ## Known Issues and Limitations
 
-- The project is still in progress, so conclusions are preliminary.
+- The article-stage exploratory analysis is complete, but the machine learning extension is still in progress.
 - The investment dataset is annual and aggregated by concessionaire; it does not show exactly where each investment was applied.
 - A simple one-year lag may not capture persistent effects from infrastructure investment.
 - The crash dataset has a kilometer discontinuity that required a corrected spatial reference.
@@ -237,12 +246,13 @@ This repository uses semantic versioning while the project evolves:
 - `v0.2.0-alpha`: initial charts completed and kilometer correction added.
 - `v0.3.0-alpha`: hotspot analysis using corrected kilometer reference.
 - `v0.4.0-alpha`: investment comparison, phase analysis and article preparation.
-- `v0.5.0-alpha`: article writing plus occurrence-level machine learning baseline and feature experiments.
-- `v1.0.0`: planned first complete public exploratory analysis and article.
+- `v0.5.0-alpha`: article development plus occurrence-level machine learning baseline and feature experiments.
+- `v0.6.0-alpha`: article accepted for presentation and publication at ANPET 2026; Random Forest-focused machine learning improvement.
+- `v1.0.0`: planned first complete public repository release.
 - Future extension: refined machine learning validation and interpretation.
 
 ## Next Step
 
-The next development step is to consolidate the exploratory findings, figures, methodology and limitations into the technical article while continuing the occurrence-level machine learning extension as a complementary analysis.
+The next development step is to continue the occurrence-level machine learning extension, especially the Random Forest path, as an additional improvement beyond the accepted ANPET 2026 article.
 
 *Developed by a Data Scientist / Analyst and Transport Engineer - Luciano Faria.*
